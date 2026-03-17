@@ -4,7 +4,7 @@ library ieee;
   use ieee.math_real.all;
   use work.config_pkg.all;
   -- PIPELINED IN LOGN;
---HEY
+
 entity bitonic_sorter is
   generic (
     n_max  : integer := 128;
