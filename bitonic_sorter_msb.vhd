@@ -83,16 +83,16 @@ architecture pipeline_stage of bitonic_sorter_msb is
   type mag_array is array (0 to n_max - 1) of unsigned(MSB_NUM - 1 downto 0); -- holds the magnitudes first MSBs
   type index_array is array (0 to n_max - 1) of unsigned(WIDTH_INDICES - 1 downto 0); --holds the indices associated with each magnitude
 
-  -- Use RAM-style arrays for stage storage (ASIC-friendly, reduces flip-flop count)
-  type mag_ram_type is array (0 to LOGN_MAX, 0 to n_max - 1) of unsigned(MSB_NUM - 1 downto 0);
-  type idx_ram_type is array (0 to LOGN_MAX, 0 to n_max - 1) of unsigned(WIDTH_INDICES - 1 downto 0);
+  -- Stage arrays(each stage takes the output of the previous one as its input)
+  type mag_stage_array is array (0 to LOGN_MAX) of mag_array; --stores the LLR magnitudes of all sorting stages(2D array [stage][element])
+  type index_stage_array is array (0 to LOGN_MAX) of index_array; --stores the index order evolution through stages(2D array [stage][index])
   -- Mask for which lanes belong to the rounded-up power-of-two (n_effective)
   type mask_array is array (0 to n_max - 1) of std_logic;
   signal active_mask : mask_array := (others => '0');
 
   -- Signals
-  signal mag_ram : mag_ram_type;
-  signal idx_ram : idx_ram_type;
+  signal mag_stages  : mag_stage_array;                                        -- main data pipeline of the sorter
+  signal idx_stages  : index_stage_array;                                      -- companion pipeline for the permutation vector
   signal stage_valid : std_logic_vector(LOGN_MAX downto 0) := (others => '0'); -- marks which stage has valid data (shift register for latency tracking)
   signal done_sort_r : std_logic                           := '0';             -- register flag for done_sort output
   signal n_r         : integer range 0 to n_max            := 0;               -- Registered version of runtime parameter n
@@ -142,8 +142,8 @@ begin
   begin
     if (rst = '1') then
       for i in 0 to n_max - 1 loop
-        mag_ram(0, i) <= (others => '0');
-        idx_ram(0, i) <= (others => '0');
+        mag_stages(0)(i) <= (others => '0');
+        idx_stages(0)(i) <= (others => '0');
         lsb_lut(i) <= (others => '0');
       end loop;
 
@@ -153,16 +153,16 @@ begin
       if load_en = '1' then -- Only load when new data arrives
         for i in 0 to n_max - 1 loop
           if i < n_r then
-            mag_ram(0, i) <= unsigned(LLR_mag((i + 1) * B_mag - 1 downto (i + 1) * B_mag - MSB_NUM)); -- take only the MSBs of each magnitude
-            idx_ram(0, i) <= to_unsigned(i, WIDTH_INDICES); -- zero-extend the MSBs to match log2(n_max) width and not log2(n)
+            mag_stages(0)(i) <= unsigned(LLR_mag((i + 1) * B_mag - 1 downto (i + 1) * B_mag - MSB_NUM)); -- take only the MSBs of each magnitude
+            idx_stages(0)(i) <= to_unsigned(i, WIDTH_INDICES); -- zero-extend the MSBs to match log2(n_max) width and not log2(n)
             lsb_lut(i) <= unsigned(LLR_mag(i * B_mag + (LSB_NUM - 1) downto i * B_mag)); -- LSBs
           elsif active_mask(i) = '1' then -- i < n_effective 
-            mag_ram(0, i) <= (others => '1'); -- pad with max value
-            idx_ram(0, i) <= to_unsigned(i, WIDTH_INDICES); -- keep unique index
+            mag_stages(0)(i) <= (others => '1'); -- pad with max value
+            idx_stages(0)(i) <= to_unsigned(i, WIDTH_INDICES); -- keep unique index
             lsb_lut(i) <= (others => '1'); -- also pad LSBs high to keep consistent ordering
           else
-            mag_ram(0, i) <= (others => '0');
-            idx_ram(0, i) <= (others => '0');
+            mag_stages(0)(i) <= (others => '0');
+            idx_stages(0)(i) <= (others => '0');
             lsb_lut(i) <= (others => '0');
           end if;
         end loop;
@@ -215,16 +215,16 @@ begin
     begin
       if (rst = '1') then
         for i in 0 to n_max - 1 loop
-          mag_ram(s + 1, i) <= (others => '0');
-          idx_ram(s + 1, i) <= (others => '0');
+          mag_stages(s + 1)(i) <= (others => '0');
+          idx_stages(s + 1)(i) <= (others => '0');
         end loop;
 
       elsif rising_edge(clk) then
 
         -- default pass-through from previous stage
         for i in 0 to n_max - 1 loop
-          tmp_mag(i) := mag_ram(s, i);
-          tmp_idx(i) := idx_ram(s, i);
+          tmp_mag(i) := mag_stages(s)(i);
+          tmp_idx(i) := idx_stages(s)(i);
         end loop;
 
         if stage_valid(s) = '1' then
@@ -292,8 +292,8 @@ begin
           end loop;
           -- register stage output
           for j in 0 to n_max - 1 loop
-            mag_ram(s + 1, j) <= tmp_mag(j);
-            idx_ram(s + 1, j) <= tmp_idx(j);
+            mag_stages(s + 1)(j) <= tmp_mag(j);
+            idx_stages(s + 1)(j) <= tmp_idx(j);
           end loop;
         end if;
 
@@ -310,7 +310,7 @@ begin
       if done_sort_r = '1' then
         for i in 0 to LW_MAX - 1 loop -- the system supports LW_MAX = 104, we only need the 104th least reliable bit in the worst case (W.C.)
           --Takes the sorted indices array (index_array) and packs it back into one wide vector for output
-          sorted_indices((i + 1) * WIDTH_INDICES - 1 downto i * WIDTH_INDICES) <= std_logic_vector(idx_ram(LOGN_MAX, i));
+          sorted_indices((i + 1) * WIDTH_INDICES - 1 downto i * WIDTH_INDICES) <= std_logic_vector(idx_stages(LOGN_MAX)(i));
         end loop;
       end if;
     end if;

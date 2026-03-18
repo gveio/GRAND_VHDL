@@ -16,7 +16,7 @@ Z2 DPx4 ieee 9 math_real 0 22 gNk<PdFJ<XNPcfef`f?Z81
 Z3 DPx4 ieee 11 numeric_std 0 22 aU^R8eGcicLcUFIaBQSL>3
 Z4 DPx3 std 6 textio 0 22 zE1`LPoLg^DX3Oz^4Fj1K3
 Z5 DPx4 ieee 14 std_logic_1164 0 22 cVAk:aDinOX8^VGI1ekP<3
-!i122 8
+!i122 24
 Z6 dC:/Sorter/GRAND_VHDL
 Z7 8C:/Sorter/GRAND_VHDL/bitonic_sorter.vhd
 Z8 FC:/Sorter/GRAND_VHDL/bitonic_sorter.vhd
@@ -26,9 +26,9 @@ VDBhXU:=2kAIKMM1PMUdK>1
 !s100 P14z`4@`]=G`81fLEM_RO0
 Z9 OV;C;2020.1;71
 32
-Z10 !s110 1773784746
+Z10 !s110 1773834715
 !i10b 1
-Z11 !s108 1773784745.000000
+Z11 !s108 1773834715.000000
 Z12 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/bitonic_sorter.vhd|
 Z13 !s107 C:/Sorter/GRAND_VHDL/bitonic_sorter.vhd|
 !i113 1
@@ -41,7 +41,7 @@ R3
 R4
 R5
 Z16 DEx4 work 14 bitonic_sorter 0 22 DBhXU:=2kAIKMM1PMUdK>1
-!i122 8
+!i122 24
 l96
 L23 272
 VcVk@ITQ=@bo3`cJ[Yd?8h1
@@ -57,27 +57,27 @@ R13
 R14
 R15
 Ebitonic_sorter_2
-R0
+Z17 w1773832971
 R1
 R2
 R3
 R4
 R5
-!i122 9
+!i122 25
 R6
-Z17 8C:/Sorter/GRAND_VHDL/bitonic_sorter_2.vhd
-Z18 FC:/Sorter/GRAND_VHDL/bitonic_sorter_2.vhd
+Z18 8C:/Sorter/GRAND_VHDL/bitonic_sorter_2.vhd
+Z19 FC:/Sorter/GRAND_VHDL/bitonic_sorter_2.vhd
 l0
 L9 1
 Vi[Gggld5bU4LM7]^[kOTG3
 !s100 DjRzgI?7V6hR0In<5]ZoS1
 R9
 32
-R10
+Z20 !s110 1773834716
 !i10b 1
-Z19 !s108 1773784746.000000
-Z20 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/bitonic_sorter_2.vhd|
-Z21 !s107 C:/Sorter/GRAND_VHDL/bitonic_sorter_2.vhd|
+R11
+Z21 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/bitonic_sorter_2.vhd|
+Z22 !s107 C:/Sorter/GRAND_VHDL/bitonic_sorter_2.vhd|
 !i113 1
 R14
 R15
@@ -88,43 +88,43 @@ R3
 R4
 R5
 DEx4 work 16 bitonic_sorter_2 0 22 i[Gggld5bU4LM7]^[kOTG3
-!i122 9
+!i122 25
 l96
 L25 263
 V3Mn5Co1So2ckF4Rl^]b<m1
 !s100 KjM88NG8U0Yi<S<f<j;U21
 R9
 32
-R10
-!i10b 1
-R19
 R20
+!i10b 1
+R11
 R21
+R22
 !i113 1
 R14
 R15
 Ebitonic_sorter_msb
-R0
+Z23 w1773834948
 R1
 R2
 R3
 R4
 R5
-!i122 10
+!i122 40
 R6
-Z22 8C:/Sorter/GRAND_VHDL/bitonic_sorter_msb.vhd
-Z23 FC:/Sorter/GRAND_VHDL/bitonic_sorter_msb.vhd
+Z24 8C:/Sorter/GRAND_VHDL/bitonic_sorter_msb.vhd
+Z25 FC:/Sorter/GRAND_VHDL/bitonic_sorter_msb.vhd
 l0
 L9 1
 Vbb=i`0P=IKg_oBMYoRnFW1
 !s100 ^89o_AOo^@d<[c7HCe6oT2
 R9
 32
-R10
+Z26 !s110 1773834972
 !i10b 1
-R19
-Z24 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/bitonic_sorter_msb.vhd|
-Z25 !s107 C:/Sorter/GRAND_VHDL/bitonic_sorter_msb.vhd|
+Z27 !s108 1773834972.000000
+Z28 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/bitonic_sorter_msb.vhd|
+Z29 !s107 C:/Sorter/GRAND_VHDL/bitonic_sorter_msb.vhd|
 !i113 1
 R14
 R15
@@ -134,19 +134,19 @@ R2
 R3
 R4
 R5
-Z26 DEx4 work 18 bitonic_sorter_msb 0 22 bb=i`0P=IKg_oBMYoRnFW1
-!i122 10
+Z30 DEx4 work 18 bitonic_sorter_msb 0 22 bb=i`0P=IKg_oBMYoRnFW1
+!i122 40
 l102
-L25 295
-V]i=>`HHZ@3BBceaQ=:e=`0
-!s100 EY4S6S:4UoG^f4LGbSmcm0
+Z31 L25 295
+V=D>CCEm3m7E7>@X?a2Aj<3
+!s100 Ed:YVFMGN]bQX]86TJYMO2
 R9
 32
-R10
+R26
 !i10b 1
-R19
-R24
-R25
+R27
+R28
+R29
 !i113 1
 R14
 R15
@@ -157,44 +157,44 @@ R1
 R2
 R4
 R5
-!i122 11
+!i122 27
 R6
-Z27 8C:/Sorter/GRAND_VHDL/bitonic_sorter_msb_tb.vhd
-Z28 FC:/Sorter/GRAND_VHDL/bitonic_sorter_msb_tb.vhd
+Z32 8C:/Sorter/GRAND_VHDL/bitonic_sorter_msb_tb.vhd
+Z33 FC:/Sorter/GRAND_VHDL/bitonic_sorter_msb_tb.vhd
 l0
 L6 1
 V:03AN2Dd79=[59Xz^45fg0
 !s100 0E8T904dkzS:G=IiPP@=21
 R9
 32
-R10
+R20
 !i10b 1
-R19
-Z29 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/bitonic_sorter_msb_tb.vhd|
-Z30 !s107 C:/Sorter/GRAND_VHDL/bitonic_sorter_msb_tb.vhd|
+Z34 !s108 1773834716.000000
+Z35 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/bitonic_sorter_msb_tb.vhd|
+Z36 !s107 C:/Sorter/GRAND_VHDL/bitonic_sorter_msb_tb.vhd|
 !i113 1
 R14
 R15
 Asim
-R26
+R30
 R3
 R1
 R2
 R4
 R5
 DEx4 work 21 bitonic_sorter_msb_tb 0 22 :03AN2Dd79=[59Xz^45fg0
-!i122 11
+!i122 27
 l22
-Z31 L9 94
+Z37 L9 94
 VZg?KJi5A3IKQ@WPclIWDI2
 !s100 82?GGLO=<Lz?UNd=ZUCBl1
 R9
 32
-R10
+R20
 !i10b 1
-R19
-R29
-R30
+R34
+R35
+R36
 !i113 1
 R14
 R15
@@ -205,21 +205,21 @@ R1
 R2
 R4
 R5
-!i122 12
+!i122 28
 R6
-Z32 8C:/Sorter/GRAND_VHDL/bitonic_sorter_tb.vhd
-Z33 FC:/Sorter/GRAND_VHDL/bitonic_sorter_tb.vhd
+Z38 8C:/Sorter/GRAND_VHDL/bitonic_sorter_tb.vhd
+Z39 FC:/Sorter/GRAND_VHDL/bitonic_sorter_tb.vhd
 l0
 L6 1
 VZ:0RCXJ?D?m`1TQT^W=LQ2
 !s100 M_GARKgD_Ob7oo<a]VX>i0
 R9
 32
-Z34 !s110 1773784747
+R20
 !i10b 1
-R19
-Z35 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/bitonic_sorter_tb.vhd|
-Z36 !s107 C:/Sorter/GRAND_VHDL/bitonic_sorter_tb.vhd|
+R34
+Z40 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/bitonic_sorter_tb.vhd|
+Z41 !s107 C:/Sorter/GRAND_VHDL/bitonic_sorter_tb.vhd|
 !i113 1
 R14
 R15
@@ -231,18 +231,18 @@ R2
 R4
 R5
 DEx4 work 17 bitonic_sorter_tb 0 22 Z:0RCXJ?D?m`1TQT^W=LQ2
-!i122 12
+!i122 28
 l22
-R31
+R37
 Vn`kkYUC;laCTGdh>4DoLO0
 !s100 J>TFz9?T3MlBN8gBn[Y_O1
 R9
 32
-R34
+R20
 !i10b 1
-R19
-R35
-R36
+R34
+R40
+R41
 !i113 1
 R14
 R15
@@ -251,7 +251,7 @@ R2
 R3
 R4
 R5
-!i122 13
+!i122 29
 R0
 R6
 8C:/Sorter/GRAND_VHDL/config_pkg.vhd
@@ -262,9 +262,9 @@ VFmU0QWhYUi7>E;6>h0n@o2
 !s100 4P5^G@g[6=C_ZKNEmS_f41
 R9
 32
-R34
+Z42 !s110 1773834717
 !i10b 1
-Z37 !s108 1773784747.000000
+Z43 !s108 1773834717.000000
 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/config_pkg.vhd|
 !s107 C:/Sorter/GRAND_VHDL/config_pkg.vhd|
 !i113 1
@@ -274,40 +274,40 @@ Econtroller
 R0
 R4
 R5
-!i122 14
+!i122 30
 R6
-Z38 8C:/Sorter/GRAND_VHDL/controller.vhd
-Z39 FC:/Sorter/GRAND_VHDL/controller.vhd
+Z44 8C:/Sorter/GRAND_VHDL/controller.vhd
+Z45 FC:/Sorter/GRAND_VHDL/controller.vhd
 l0
 L6 1
 VW3aLLhb<]L9aW=XLMl`@j1
 !s100 P[F7l46E0P7A9GOOe34kL0
 R9
 32
-R34
+R42
 !i10b 1
-R37
-Z40 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/controller.vhd|
-Z41 !s107 C:/Sorter/GRAND_VHDL/controller.vhd|
+R43
+Z46 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/controller.vhd|
+Z47 !s107 C:/Sorter/GRAND_VHDL/controller.vhd|
 !i113 1
 R14
 R15
 Afsm
 R4
 R5
-Z42 DEx4 work 10 controller 0 22 W3aLLhb<]L9aW=XLMl`@j1
-!i122 14
+Z48 DEx4 work 10 controller 0 22 W3aLLhb<]L9aW=XLMl`@j1
+!i122 30
 l53
 L37 133
 VmEKLhdA?7gezjlF;DlS<E3
 !s100 NKADEgz[JQ<8@GjHcL7^a1
 R9
 32
-R34
+R42
 !i10b 1
-R37
-R40
-R41
+R43
+R46
+R47
 !i113 1
 R14
 R15
@@ -315,48 +315,48 @@ Eerror_checker
 R0
 R2
 R1
-Z43 DPx4 work 9 types_pkg 0 22 H7JY@MhU7Ee4E`[]lOghc0
+Z49 DPx4 work 9 types_pkg 0 22 H7JY@MhU7Ee4E`[]lOghc0
 R3
 R4
 R5
-!i122 15
+!i122 31
 R6
-Z44 8C:/Sorter/GRAND_VHDL/error_checker.vhd
-Z45 FC:/Sorter/GRAND_VHDL/error_checker.vhd
+Z50 8C:/Sorter/GRAND_VHDL/error_checker.vhd
+Z51 FC:/Sorter/GRAND_VHDL/error_checker.vhd
 l0
 L7 1
 V@9Ezllin9P^;8zd3EH=M93
 !s100 ;In89_N=G3QWhJ9Kz5VP01
 R9
 32
-R34
+R42
 !i10b 1
-R37
-Z46 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/error_checker.vhd|
-Z47 !s107 C:/Sorter/GRAND_VHDL/error_checker.vhd|
+R43
+Z52 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/error_checker.vhd|
+Z53 !s107 C:/Sorter/GRAND_VHDL/error_checker.vhd|
 !i113 1
 R14
 R15
 Aarch1
 R2
 R1
-R43
+R49
 R3
 R4
 R5
-Z48 DEx4 work 13 error_checker 0 22 @9Ezllin9P^;8zd3EH=M93
-!i122 15
+Z54 DEx4 work 13 error_checker 0 22 @9Ezllin9P^;8zd3EH=M93
+!i122 31
 l28
 L24 53
 VSzV94?BL41zODCRFMMUVA1
 !s100 zc@8oh]hkBzlLB<migUYd3
 R9
 32
-R34
+R42
 !i10b 1
-R37
-R46
-R47
+R43
+R52
+R53
 !i113 1
 R14
 R15
@@ -367,21 +367,21 @@ R2
 R3
 R4
 R5
-!i122 16
+!i122 32
 R6
-Z49 8C:/Sorter/GRAND_VHDL/error_generator.vhd
-Z50 FC:/Sorter/GRAND_VHDL/error_generator.vhd
+Z55 8C:/Sorter/GRAND_VHDL/error_generator.vhd
+Z56 FC:/Sorter/GRAND_VHDL/error_generator.vhd
 l0
 L7 1
 VY^X`BW:PhFF0^DPbO`Z8;1
 !s100 hn1S1NS<IeYA^HbAU>>ea2
 R9
 32
-Z51 !s110 1773784748
+Z57 !s110 1773834718
 !i10b 1
-R37
-Z52 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/error_generator.vhd|
-Z53 !s107 C:/Sorter/GRAND_VHDL/error_generator.vhd|
+R43
+Z58 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/error_generator.vhd|
+Z59 !s107 C:/Sorter/GRAND_VHDL/error_generator.vhd|
 !i113 1
 R14
 R15
@@ -391,19 +391,19 @@ R2
 R3
 R4
 R5
-Z54 DEx4 work 15 error_generator 0 22 Y^X`BW:PhFF0^DPbO`Z8;1
-!i122 16
+Z60 DEx4 work 15 error_generator 0 22 Y^X`BW:PhFF0^DPbO`Z8;1
+!i122 32
 l31
 L30 34
 V_z2=QnK:f`3[n10iTi5781
 !s100 L=V4KX_23oGP?m[^flimc1
 R9
 32
-R51
+R57
 !i10b 1
-R37
-R52
-R53
+R43
+R58
+R59
 !i113 1
 R14
 R15
@@ -414,21 +414,21 @@ R1
 R3
 R4
 R5
-!i122 17
+!i122 33
 R6
-Z55 8C:/Sorter/GRAND_VHDL/landslide_unit.vhd
-Z56 FC:/Sorter/GRAND_VHDL/landslide_unit.vhd
+Z61 8C:/Sorter/GRAND_VHDL/landslide_unit.vhd
+Z62 FC:/Sorter/GRAND_VHDL/landslide_unit.vhd
 l0
 L6 1
 VO5IdZLT1Y;SXNJDHn4JVF1
 !s100 ;@I<^;@z;bQM`L:bFd`eH3
 R9
 32
-R51
+R57
 !i10b 1
-Z57 !s108 1773784748.000000
-Z58 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/landslide_unit.vhd|
-Z59 !s107 C:/Sorter/GRAND_VHDL/landslide_unit.vhd|
+Z63 !s108 1773834718.000000
+Z64 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/landslide_unit.vhd|
+Z65 !s107 C:/Sorter/GRAND_VHDL/landslide_unit.vhd|
 !i113 1
 R14
 R15
@@ -438,19 +438,19 @@ R1
 R3
 R4
 R5
-Z60 DEx4 work 14 landslide_unit 0 22 O5IdZLT1Y;SXNJDHn4JVF1
-!i122 17
+Z66 DEx4 work 14 landslide_unit 0 22 O5IdZLT1Y;SXNJDHn4JVF1
+!i122 33
 l49
 L22 271
 Vjh98eGZna9Q0=7e:zV49]1
 !s100 5;J2DDj8biDE`]?CbOeQN3
 R9
 32
-R51
-!i10b 1
 R57
-R58
-R59
+!i10b 1
+R63
+R64
+R65
 !i113 1
 R14
 R15
@@ -461,21 +461,21 @@ R1
 R3
 R4
 R5
-!i122 18
+!i122 34
 R6
-Z61 8C:/Sorter/GRAND_VHDL/llrs_in.vhd
-Z62 FC:/Sorter/GRAND_VHDL/llrs_in.vhd
+Z67 8C:/Sorter/GRAND_VHDL/llrs_in.vhd
+Z68 FC:/Sorter/GRAND_VHDL/llrs_in.vhd
 l0
 L6 1
 V@21LWNeMabPFM>53bDNO21
 !s100 IG<c<HJW8TlU0L^8MO2e00
 R9
 32
-R51
-!i10b 1
 R57
-Z63 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/llrs_in.vhd|
-Z64 !s107 C:/Sorter/GRAND_VHDL/llrs_in.vhd|
+!i10b 1
+R63
+Z69 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/llrs_in.vhd|
+Z70 !s107 C:/Sorter/GRAND_VHDL/llrs_in.vhd|
 !i113 1
 R14
 R15
@@ -485,19 +485,19 @@ R1
 R3
 R4
 R5
-Z65 DEx4 work 7 llrs_in 0 22 @21LWNeMabPFM>53bDNO21
-!i122 18
+Z71 DEx4 work 7 llrs_in 0 22 @21LWNeMabPFM>53bDNO21
+!i122 34
 l22
 L21 22
 VARG[k:TeVR8:U`=]G?@zC3
 !s100 kYfZLRVL5[l5ZbCUXB]8z2
 R9
 32
-R51
-!i10b 1
 R57
+!i10b 1
 R63
-R64
+R69
+R70
 !i113 1
 R14
 R15
@@ -508,21 +508,21 @@ R1
 R3
 R4
 R5
-!i122 19
+!i122 35
 R6
-Z66 8C:/Sorter/GRAND_VHDL/lw_hw_generation_unit.vhd
-Z67 FC:/Sorter/GRAND_VHDL/lw_hw_generation_unit.vhd
+Z72 8C:/Sorter/GRAND_VHDL/lw_hw_generation_unit.vhd
+Z73 FC:/Sorter/GRAND_VHDL/lw_hw_generation_unit.vhd
 l0
 L6 1
 VjI?zjT^gzJdNX[`gPb^A30
 !s100 5NMLmVfem1b`SkQ9=m:iK2
 R9
 32
-R51
+Z74 !s110 1773834719
 !i10b 1
-R57
-Z68 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/lw_hw_generation_unit.vhd|
-Z69 !s107 C:/Sorter/GRAND_VHDL/lw_hw_generation_unit.vhd|
+R63
+Z75 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/lw_hw_generation_unit.vhd|
+Z76 !s107 C:/Sorter/GRAND_VHDL/lw_hw_generation_unit.vhd|
 !i113 1
 R14
 R15
@@ -532,74 +532,74 @@ R1
 R3
 R4
 R5
-Z70 DEx4 work 21 lw_hw_generation_unit 0 22 jI?zjT^gzJdNX[`gPb^A30
-!i122 19
+Z77 DEx4 work 21 lw_hw_generation_unit 0 22 jI?zjT^gzJdNX[`gPb^A30
+!i122 35
 l26
 L21 47
 VV7`VI_HeaEk<LYIYZUSYU3
 !s100 db`JN1kz_SDFo]4m`EjE51
 R9
 32
-R51
+R74
 !i10b 1
-R57
-R68
-R69
+R63
+R75
+R76
 !i113 1
 R14
 R15
 Eorbgrand
 R0
 R1
-R43
+R49
 R2
 R3
 R4
 R5
-!i122 20
+!i122 36
 R6
-Z71 8C:/Sorter/GRAND_VHDL/ORBGRAND.vhd
-Z72 FC:/Sorter/GRAND_VHDL/ORBGRAND.vhd
+Z78 8C:/Sorter/GRAND_VHDL/ORBGRAND.vhd
+Z79 FC:/Sorter/GRAND_VHDL/ORBGRAND.vhd
 l0
 L8 1
 VfB^`cb`0eK?a7]4LI@0nC0
 !s100 c5bKMZSjIM6m9>;;27gFO2
 R9
 32
-Z73 !s110 1773784749
+R74
 !i10b 1
-Z74 !s108 1773784749.000000
-Z75 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/ORBGRAND.vhd|
-Z76 !s107 C:/Sorter/GRAND_VHDL/ORBGRAND.vhd|
+Z80 !s108 1773834719.000000
+Z81 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/ORBGRAND.vhd|
+Z82 !s107 C:/Sorter/GRAND_VHDL/ORBGRAND.vhd|
 !i113 1
 R14
 R15
 Aarch
-R26
+R30
+R60
+Z83 DEx4 work 17 pattern_generator 0 22 0@L<aFolPfCEAO>zddjmG2
 R54
-Z77 DEx4 work 17 pattern_generator 0 22 0@L<aFolPfCEAO>zddjmG2
+R71
 R48
-R65
-R42
 R1
-R43
+R49
 R2
 R3
 R4
 R5
-Z78 DEx4 work 8 orbgrand 0 22 fB^`cb`0eK?a7]4LI@0nC0
-!i122 20
+Z84 DEx4 work 8 orbgrand 0 22 fB^`cb`0eK?a7]4LI@0nC0
+!i122 36
 l81
 L31 257
 Vi3>9SPC28LMoh@GdR2Mfg3
 !s100 R34WEDn=Nei@6498?VmXW2
 R9
 32
-R73
-!i10b 1
 R74
-R75
-R76
+!i10b 1
+R80
+R81
+R82
 !i113 1
 R14
 R15
@@ -607,49 +607,49 @@ Eorbgrand_tb
 R0
 R3
 R1
-R43
+R49
 R2
 R4
 R5
-!i122 21
+!i122 37
 R6
-Z79 8C:/Sorter/GRAND_VHDL/ORBGRAND_tb.vhd
-Z80 FC:/Sorter/GRAND_VHDL/ORBGRAND_tb.vhd
+Z85 8C:/Sorter/GRAND_VHDL/ORBGRAND_tb.vhd
+Z86 FC:/Sorter/GRAND_VHDL/ORBGRAND_tb.vhd
 l0
 L7 1
 VSQUgOG2BI=0eJi[DeDSPW1
 !s100 n<g[UlLH^ln2LNQ=Xf_[43
 R9
 32
-R73
-!i10b 1
 R74
-Z81 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/ORBGRAND_tb.vhd|
-Z82 !s107 C:/Sorter/GRAND_VHDL/ORBGRAND_tb.vhd|
+!i10b 1
+R80
+Z87 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/ORBGRAND_tb.vhd|
+Z88 !s107 C:/Sorter/GRAND_VHDL/ORBGRAND_tb.vhd|
 !i113 1
 R14
 R15
 Asim
-R78
+R84
 R3
 R1
-R43
+R49
 R2
 R4
 R5
 DEx4 work 11 orbgrand_tb 0 22 SQUgOG2BI=0eJi[DeDSPW1
-!i122 21
+!i122 37
 l28
 L10 108
 Vn;km@li<>NknXViEE4Ih81
 !s100 j=6S4`0BQS1I@zgOCB_V:2
 R9
 32
-R73
-!i10b 1
 R74
-R81
-R82
+!i10b 1
+R80
+R87
+R88
 !i113 1
 R14
 R15
@@ -660,45 +660,45 @@ R1
 R3
 R4
 R5
-!i122 22
+!i122 38
 R6
-Z83 8C:/Sorter/GRAND_VHDL/pattern_generator.vhd
-Z84 FC:/Sorter/GRAND_VHDL/pattern_generator.vhd
+Z89 8C:/Sorter/GRAND_VHDL/pattern_generator.vhd
+Z90 FC:/Sorter/GRAND_VHDL/pattern_generator.vhd
 l0
 L6 1
 V0@L<aFolPfCEAO>zddjmG2
 !s100 bAojKITXgfWM_F4Pknknb2
 R9
 32
-R73
+Z91 !s110 1773834720
 !i10b 1
-R74
-Z85 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/pattern_generator.vhd|
-Z86 !s107 C:/Sorter/GRAND_VHDL/pattern_generator.vhd|
+R80
+Z92 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/pattern_generator.vhd|
+Z93 !s107 C:/Sorter/GRAND_VHDL/pattern_generator.vhd|
 !i113 1
 R14
 R15
 Aarch
-R60
-R70
+R66
+R77
 R2
 R1
 R3
 R4
 R5
-R77
-!i122 22
+R83
+!i122 38
 l33
 L24 58
 VUS24i0F`43QN0NFU>;Jm<1
 !s100 SPlamY7QJXCBl38zN0]h@0
 R9
 32
-R73
+R91
 !i10b 1
-R74
-R85
-R86
+R80
+R92
+R93
 !i113 1
 R14
 R15
@@ -708,7 +708,7 @@ R3
 R1
 R4
 R5
-!i122 23
+!i122 39
 R0
 R6
 8C:/Sorter/GRAND_VHDL/types_pkg.vhd
@@ -719,9 +719,9 @@ VH7JY@MhU7Ee4E`[]lOghc0
 !s100 >QOcKTNifXgNPX^bA`7752
 R9
 32
-!s110 1773784750
+R91
 !i10b 1
-R74
+!s108 1773834720.000000
 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/types_pkg.vhd|
 !s107 C:/Sorter/GRAND_VHDL/types_pkg.vhd|
 !i113 1
