@@ -211,7 +211,7 @@ begin
       variable tmp_mag      : mag_array;
       variable tmp_idx      : index_array;
       variable lsb_a, lsb_b : unsigned(LSB_NUM - 1 downto 0);
-      variable do_cmp       : boolean;
+      
     begin
       if (rst = '1') then
         for i in 0 to n_max - 1 loop

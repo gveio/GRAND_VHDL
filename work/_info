@@ -104,13 +104,13 @@ R22
 R14
 R15
 Ebitonic_sorter_msb
-Z23 w1773834948
+Z23 w1773837931
 R1
 R2
 R3
 R4
 R5
-!i122 40
+!i122 41
 R6
 Z24 8C:/Sorter/GRAND_VHDL/bitonic_sorter_msb.vhd
 Z25 FC:/Sorter/GRAND_VHDL/bitonic_sorter_msb.vhd
@@ -120,9 +120,9 @@ Vbb=i`0P=IKg_oBMYoRnFW1
 !s100 ^89o_AOo^@d<[c7HCe6oT2
 R9
 32
-Z26 !s110 1773834972
+Z26 !s110 1773838039
 !i10b 1
-Z27 !s108 1773834972.000000
+Z27 !s108 1773838038.000000
 Z28 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/bitonic_sorter_msb.vhd|
 Z29 !s107 C:/Sorter/GRAND_VHDL/bitonic_sorter_msb.vhd|
 !i113 1
@@ -135,11 +135,11 @@ R3
 R4
 R5
 Z30 DEx4 work 18 bitonic_sorter_msb 0 22 bb=i`0P=IKg_oBMYoRnFW1
-!i122 40
+!i122 41
 l102
 Z31 L25 295
-V=D>CCEm3m7E7>@X?a2Aj<3
-!s100 Ed:YVFMGN]bQX]86TJYMO2
+V]i=>`HHZ@3BBceaQ=:e=`0
+!s100 EY4S6S:4UoG^f4LGbSmcm0
 R9
 32
 R26
