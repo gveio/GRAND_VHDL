@@ -10,13 +10,13 @@ z2
 cModel Technology
 dC:/intelFPGA/20.1
 Ebitonic_sorter
-Z0 w1775033476
+Z0 w1775035482
 Z1 DPx4 work 10 config_pkg 0 22 FmU0QWhYUi7>E;6>h0n@o2
 Z2 DPx4 ieee 9 math_real 0 22 gNk<PdFJ<XNPcfef`f?Z81
 Z3 DPx4 ieee 11 numeric_std 0 22 aU^R8eGcicLcUFIaBQSL>3
 Z4 DPx3 std 6 textio 0 22 zE1`LPoLg^DX3Oz^4Fj1K3
 Z5 DPx4 ieee 14 std_logic_1164 0 22 cVAk:aDinOX8^VGI1ekP<3
-!i122 48
+!i122 50
 Z6 dC:/Sorter/GRAND_VHDL
 Z7 8C:/Sorter/GRAND_VHDL/bitonic_sorter.vhd
 Z8 FC:/Sorter/GRAND_VHDL/bitonic_sorter.vhd
@@ -26,9 +26,9 @@ VDBhXU:=2kAIKMM1PMUdK>1
 !s100 P14z`4@`]=G`81fLEM_RO0
 Z9 OV;C;2020.1;71
 32
-Z10 !s110 1775033499
+Z10 !s110 1775035540
 !i10b 1
-Z11 !s108 1775033498.000000
+Z11 !s108 1775035539.000000
 Z12 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/bitonic_sorter.vhd|
 Z13 !s107 C:/Sorter/GRAND_VHDL/bitonic_sorter.vhd|
 !i113 1
@@ -41,11 +41,11 @@ R3
 R4
 R5
 Z16 DEx4 work 14 bitonic_sorter 0 22 DBhXU:=2kAIKMM1PMUdK>1
-!i122 48
+!i122 50
 l96
-L23 265
-VH;WI>357liTjn8>2`@LXT1
-!s100 eLgkIkb[lAGOBbkJghQb91
+L23 268
+VP`o;M=7=KHOzQLOOf;Hhf1
+!s100 km_djVXz``dk]EIUS2meW3
 R9
 32
 R10
@@ -104,13 +104,13 @@ R23
 R14
 R15
 Ebitonic_sorter_msb
-Z24 w1775033405
+Z24 w1775033965
 R1
 R2
 R3
 R4
 R5
-!i122 47
+!i122 49
 R6
 Z25 8C:/Sorter/GRAND_VHDL/bitonic_sorter_msb.vhd
 Z26 FC:/Sorter/GRAND_VHDL/bitonic_sorter_msb.vhd
@@ -120,9 +120,9 @@ VcLSV=aA@^e]G`nIbSIYfC2
 !s100 Z`L<lJKS]L9>??gBB@4HV1
 R9
 32
-Z27 !s110 1775033496
+Z27 !s110 1775034026
 !i10b 1
-Z28 !s108 1775033496.000000
+Z28 !s108 1775034026.000000
 Z29 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Sorter/GRAND_VHDL/bitonic_sorter_msb.vhd|
 Z30 !s107 C:/Sorter/GRAND_VHDL/bitonic_sorter_msb.vhd|
 !i113 1
@@ -135,11 +135,11 @@ R3
 R4
 R5
 Z31 DEx4 work 18 bitonic_sorter_msb 0 22 cLSV=aA@^e]G`nIbSIYfC2
-!i122 47
+!i122 49
 l101
 L25 288
-VRXRAf7Xf[zLX_[Kc6fY2?2
-!s100 m7nMC4^IMYgM=>C4Vz2lz1
+Vfl:=2fj`NdfM1I>L87JES3
+!s100 @F2H7bJ0hIo5PgnYiabji2
 R9
 32
 R27

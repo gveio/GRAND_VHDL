@@ -19,7 +19,6 @@ add wave sim:/bitonic_sorter_tb/DUT/sort_en
 # ============================================================
 add wave -divider "Runtime parameters"
 add wave sim:/bitonic_sorter_tb/DUT/n_r
-add wave sim:/bitonic_sorter_tb/DUT/config_done
 add wave sim:/bitonic_sorter_tb/DUT/load_en
 
 # ============================================================

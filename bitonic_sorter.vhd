@@ -90,31 +90,25 @@ architecture pipeline_stage of bitonic_sorter is
   signal stage_valid : std_logic_vector(LOGN_MAX downto 0) := (others => '0'); -- marks which stage has valid data (shift register for latency tracking)
   signal done_sort_r : std_logic                           := '0';             -- register flag for done_sort output
   signal n_r         : integer range 0 to n_max            := 0;               -- Registered version of runtime parameter n
-  signal config_done : std_logic                           := '0';             -- flag to indicate that configuration parameters have been latched
   signal load_en     : std_logic                           := '0';             -- signal to enable loading of new data
+  signal sort_en_d   : std_logic                           := '0';             -- delayed version of sort_en to create a load enable pulse one cycle after sort_en goes high
 
 begin
   -- output flag when sorting is done
   done_sort <= done_sort_r;
 
-  -- Initialize sorting stages and runtime code length for dynamic n
+  -- Configuration + active mask
   process (clk, rst)
     variable n_effective : integer range 0 to n_max; -- n rounded up to power-of-two
   begin
     if rst = '1' then
       n_r <= 0;
-      config_done <= '0';
-      load_en <= '0';
       active_mask <= (others => '0');
 
     elsif rising_edge(clk) then
-      config_done <= '0';
-      load_en <= config_done; -- load enable delayed by one cycle after config
-      if sort_en = '1' then -- latch parameters at start of sorting
+      if sort_en = '1' then
         n_r <= n;
         n_effective := ceil_pow2(n);
-
-        -- precompute which lanes are active for sorting
         for i in 0 to n_max - 1 loop
           if i < n_effective then
             active_mask(i) <= '1';
@@ -122,11 +116,20 @@ begin
             active_mask(i) <= '0';
           end if;
         end loop;
-
-        config_done <= '1';
       end if;
     end if;
   end process;
+
+  process (clk, rst)
+  begin
+    if rst = '1' then
+      sort_en_d <= '0';
+    elsif rising_edge(clk) then
+      sort_en_d <= sort_en;
+    end if;
+  end process;
+
+  load_en <= sort_en_d;
 
   -- Stage 0 (load LLR magnitudes,initialize indices)
   process (clk, rst)

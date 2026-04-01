@@ -1,15 +1,4 @@
-C:/Sorter/GRAND_VHDL/bitonic_sorter.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/Sorter/GRAND_VHDL/bitonic_sorter.vhd
-Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 28 2020
--- Loading package STANDARD
--- Loading package TEXTIO
--- Loading package std_logic_1164
--- Loading package NUMERIC_STD
--- Loading package MATH_REAL
--- Loading package config_pkg
--- Compiling entity bitonic_sorter
--- Compiling architecture pipeline_stage of bitonic_sorter
-
-} {} {}} C:/Sorter/GRAND_VHDL/error_checker.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/Sorter/GRAND_VHDL/error_checker.vhd
+C:/Sorter/GRAND_VHDL/error_checker.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/Sorter/GRAND_VHDL/error_checker.vhd
 Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 28 2020
 -- Loading package STANDARD
 -- Loading package TEXTIO
@@ -20,6 +9,17 @@ Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 
 -- Loading package types_pkg
 -- Compiling entity error_checker
 -- Compiling architecture arch1 of error_checker
+
+} {} {}} C:/Sorter/GRAND_VHDL/bitonic_sorter_msb.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/Sorter/GRAND_VHDL/bitonic_sorter_msb.vhd
+Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 28 2020
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package MATH_REAL
+-- Loading package config_pkg
+-- Compiling entity bitonic_sorter_msb
+-- Compiling architecture pipeline_stage of bitonic_sorter_msb
 
 } {} {}} C:/Sorter/GRAND_VHDL/error_generator.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/Sorter/GRAND_VHDL/error_generator.vhd
 Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 28 2020

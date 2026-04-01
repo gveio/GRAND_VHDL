@@ -84,3 +84,16 @@ do C:/Sorter/GRAND_VHDL/bitonic_sorter.do
 quit -sim
 # End time: 11:54:33 on Apr 01,2026, Elapsed time: 0:02:45
 # Errors: 0, Warnings: 3
+# Compile of bitonic_sorter_msb.vhd was successful.
+# Compile of bitonic_sorter.vhd was successful.
+do C:/Sorter/GRAND_VHDL/bitonic_sorter.do
+# vsim -gui work.bitonic_sorter_tb 
+# Start time: 12:25:43 on Apr 01,2026
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.math_real(body)
+# Loading ieee.numeric_std(body)
+# Loading work.config_pkg
+# Loading work.bitonic_sorter_tb(sim)
+# Loading work.bitonic_sorter(pipeline_stage)
