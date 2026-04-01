@@ -72,8 +72,8 @@ architecture pipeline_stage of bitonic_sorter_msb is
   end function;
 
   constant LOGN_MAX  : integer := int_log2_ceil(n_max);
-  constant MSB_NUM   : integer := 3; -- number of MSBs to consider for sorting
-  constant LSB_NUM   : integer := 2; -- tie-break bits
+  constant MSB_NUM   : integer := 3;            -- number of MSBs to consider for sorting
+  constant LSB_NUM   : integer := 2;            -- tie-break bits
   constant TIE_START : integer := LOGN_MAX - 2; -- stage from which we start tie-breaking using LSBs (only in the last two stages)
 
   -- Type definitions
@@ -84,7 +84,7 @@ architecture pipeline_stage of bitonic_sorter_msb is
   -- Stage arrays(each stage takes the output of the previous one as its input)
   type mag_stage_array is array (0 to LOGN_MAX) of mag_array; --stores the LLR magnitudes of all sorting stages(2D array [stage][element])
   type index_stage_array is array (0 to LOGN_MAX) of index_array; --stores the index order evolution through stages(2D array [stage][index])
-  type lsb_stage_array is array (0 to LOGN_MAX) of lsb_array; -- stores only late-stage LSB pipeline (2D array [stage][element])
+  type lsb_stage_array is array (0 to LOGN_MAX) of lsb_array; -- local LSB pipeline used meaningfully only in the last two stages
   -- Mask for which lanes belong to the rounded-up power-of-two (n_effective)
   type mask_array is array (0 to n_max - 1) of std_logic;
   signal active_mask : mask_array := (others => '0');
@@ -92,7 +92,7 @@ architecture pipeline_stage of bitonic_sorter_msb is
   -- Signals
   signal mag_stages  : mag_stage_array;                                                    -- main data pipeline of the sorter
   signal idx_stages  : index_stage_array;                                                  -- companion pipeline for the permutation vector
-  signal lsb_stages  : lsb_stage_array;                                                    -- companion pipeline for the tie-breaking bits
+  signal lsb_stages  : lsb_stage_array;                                                    -- stage-aligned storage for late-stage LSB refinement
   signal lsb_lut     : lsb_array                           := (others => (others => '0')); -- LUT to hold the LSBs of the input magnitudes for tie-breaking (only used in the last two stages)
   signal stage_valid : std_logic_vector(LOGN_MAX downto 0) := (others => '0');             -- marks which stage has valid data (shift register for latency tracking)
   signal done_sort_r : std_logic                           := '0';                         -- register flag for done_sort output
@@ -146,7 +146,7 @@ begin
         mag_stages(0)(i) <= (others => '0');
         idx_stages(0)(i) <= (others => '0');
         lsb_stages(0)(i) <= (others => '0');
-        lsb_lut(i)       <= (others => '0');
+        lsb_lut(i) <= (others => '0');
       end loop;
 
     elsif rising_edge(clk) then
@@ -279,7 +279,7 @@ begin
                     do_swap := (mag_a < mag_b) or (TIE_STAGE and (mag_a = mag_b) and (lsb_a < lsb_b));
                   end if;
 
-                 if do_swap then
+                  if do_swap then
                     tmp_mag(i) := mag_b;
                     tmp_mag(partner) := mag_a;
                     tmp_idx(i) := idx_b;
@@ -289,7 +289,7 @@ begin
                       tmp_lsb(i) := lsb_b;
                       tmp_lsb(partner) := lsb_a;
                     end if;
-                  
+
                   end if;
                 end if;
               end if;

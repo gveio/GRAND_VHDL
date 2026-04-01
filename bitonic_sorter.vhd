@@ -7,7 +7,7 @@ library ieee;
 
 entity bitonic_sorter is
   generic (
-    n_max  : integer := 128;
+    n_max  : integer := 256;
     B_mag  : integer := 5;
     LW_MAX : integer := 104
   );

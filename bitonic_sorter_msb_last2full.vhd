@@ -74,12 +74,12 @@ architecture pipeline_stage of bitonic_sorter_msb_last2full is
   constant LOGN_MAX  : integer := int_log2_ceil(n_max);
   constant MSB_NUM   : integer := 3; -- number of MSBs to consider for sorting
   constant LSB_NUM   : integer := 2; -- tie-break bits
-  constant TIE_START : integer := LOGN_MAX - 2; -- stage from which we start tie-breaking using LSBs (only in the last two stages)
+  constant TIE_START : integer := LOGN_MAX - 2; -- stage from which we start full-precision comparison using reconstructed LSBs
 
   -- Type definitions
   type mag_array is array (0 to n_max - 1) of unsigned(MSB_NUM - 1 downto 0); -- holds the magnitudes first MSBs
   type index_array is array (0 to n_max - 1) of unsigned(WIDTH_INDICES - 1 downto 0); --holds the indices associated with each magnitude
-  type lsb_array is array (0 to n_max - 1) of unsigned(LSB_NUM - 1 downto 0); -- holds the magnitudes LSBs for tie-breaking in the last stages
+  type lsb_array is array (0 to n_max - 1) of unsigned(LSB_NUM - 1 downto 0); -- holds the magnitudes LSBs for full-precision comparison in the last stages
 
   -- Stage arrays(each stage takes the output of the previous one as its input)
   type mag_stage_array is array (0 to LOGN_MAX) of mag_array; --stores the LLR magnitudes of all sorting stages(2D array [stage][element])
@@ -92,8 +92,8 @@ architecture pipeline_stage of bitonic_sorter_msb_last2full is
   -- Signals
   signal mag_stages  : mag_stage_array;                                                    -- main data pipeline of the sorter
   signal idx_stages  : index_stage_array;                                                  -- companion pipeline for the permutation vector
-  signal lsb_stages  : lsb_stage_array;                                                    -- companion pipeline for the tie-breaking bits
-  signal lsb_lut     : lsb_array                           := (others => (others => '0')); -- LUT to hold the LSBs of the input magnitudes for tie-breaking (only used in the last two stages)
+  signal lsb_stages  : lsb_stage_array;                                                    -- local low-bit pipeline used only for the last two full-precision stages
+  signal lsb_lut     : lsb_array                           := (others => (others => '0')); -- LUT to hold the LSBs of the input magnitudes for full-precision comparison (only used in the last two stages)
   signal stage_valid : std_logic_vector(LOGN_MAX downto 0) := (others => '0');             -- marks which stage has valid data (shift register for latency tracking)
   signal done_sort_r : std_logic                           := '0';                         -- register flag for done_sort output
   signal n_r         : integer range 0 to n_max            := 0;                           -- Registered version of runtime parameter n

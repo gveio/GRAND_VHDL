@@ -88,33 +88,26 @@ architecture pipeline_substage of bitonic_sorter_2 is
 
   signal stage_valid : std_logic_vector(STAGES downto 0) := (others => '0');
   signal n_r         : integer range 0 to n_max          := 0;
-  signal config_done : std_logic                         := '0';
   signal load_en     : std_logic                         := '0';
-
-  signal done_sort_r : std_logic := '0';
-
+  signal done_sort_r : std_logic                         := '0';
+  signal sort_en_d   : std_logic                         := '0';
 begin
+
   -- output flag when sorting is done
   done_sort <= done_sort_r;
 
-  -- Initialize sorting stages and runtime code length for dynamic n
+  -- Configuration + active mask
   process (clk, rst)
     variable n_effective : integer range 0 to n_max; -- n rounded up to power-of-two
   begin
     if rst = '1' then
       n_r <= 0;
-      config_done <= '0';
-      load_en <= '0';
       active_mask <= (others => '0');
 
     elsif rising_edge(clk) then
-      config_done <= '0';
-      load_en <= config_done; -- load enable delayed by one cycle after config
-      if sort_en = '1' then -- latch parameters at start of sorting
+      if sort_en = '1' then
         n_r <= n;
         n_effective := ceil_pow2(n);
-
-        -- precompute which lanes are active for sorting
         for i in 0 to n_max - 1 loop
           if i < n_effective then
             active_mask(i) <= '1';
@@ -122,11 +115,20 @@ begin
             active_mask(i) <= '0';
           end if;
         end loop;
-
-        config_done <= '1';
       end if;
     end if;
   end process;
+
+  process (clk, rst)
+  begin
+    if rst = '1' then
+      sort_en_d <= '0';
+    elsif rising_edge(clk) then
+      sort_en_d <= sort_en;
+    end if;
+  end process;
+
+  load_en <= sort_en_d;
 
   -- Stage 0 (load LLR magnitudes,initialize indices)
   process (clk, rst)
@@ -197,6 +199,7 @@ begin
         variable dir_asc      : boolean;
         variable mag_a, mag_b : unsigned(B_mag - 1 downto 0);
         variable idx_a, idx_b : unsigned(WIDTH_INDICES - 1 downto 0);
+        variable do_swap      : boolean;
       begin
         if rst = '1' then
           for i in 0 to n_max - 1 loop
@@ -227,33 +230,19 @@ begin
                   mag_b := tmp_mag(partner);
                   idx_a := tmp_idx(i);
                   idx_b := tmp_idx(partner);
-
+                  
                   if dir_asc then -- if ascending
-                    if mag_a > mag_b then
-                      tmp_mag(i) := mag_b;
-                      tmp_mag(partner) := mag_a;
-                      tmp_idx(i) := idx_b;
-                      tmp_idx(partner) := idx_a;
-                    else
-                      tmp_mag(i) := mag_a;
-                      tmp_mag(partner) := mag_b;
-                      tmp_idx(i) := idx_a;
-                      tmp_idx(partner) := idx_b;
-                    end if;
+                    do_swap := mag_a > mag_b;
                   else -- if descending
-                    if mag_a < mag_b then
-                      tmp_mag(i) := mag_b;
-                      tmp_mag(partner) := mag_a;
-                      tmp_idx(i) := idx_b;
-                      tmp_idx(partner) := idx_a;
-                    else
-                      tmp_mag(i) := mag_a;
-                      tmp_mag(partner) := mag_b;
-                      tmp_idx(i) := idx_a;
-                      tmp_idx(partner) := idx_b;
-                    end if;
+                    do_swap := mag_a < mag_b;
                   end if;
 
+                  if do_swap then
+                    tmp_mag(i) := mag_b;
+                    tmp_mag(partner) := mag_a;
+                    tmp_idx(i) := idx_b;
+                    tmp_idx(partner) := idx_a;
+                  end if;
                 end if;
               end if;
             end loop;
