@@ -97,3 +97,6 @@ do C:/Sorter/GRAND_VHDL/bitonic_sorter.do
 # Loading work.config_pkg
 # Loading work.bitonic_sorter_tb(sim)
 # Loading work.bitonic_sorter(pipeline_stage)
+quit -sim
+# End time: 12:33:16 on Apr 01,2026, Elapsed time: 0:07:33
+# Errors: 0, Warnings: 3
