@@ -27,7 +27,8 @@ add wave sim:/bitonic_sorter_msb_last2full_tb/DUT/load_en
 add wave -divider "Mag,Index regs"
 add wave sim:/bitonic_sorter_msb_last2full_tb/DUT/mag_stages
 add wave sim:/bitonic_sorter_msb_last2full_tb/DUT/idx_stages
-add wave sim:/bitonic_sorter_msb_last2full_tb/DUT/lsb_stages
+add wave sim:/bitonic_sorter_msb_last2full_tb/DUT/lsb_lut
+add wave sim:/bitonic_sorter_msb_last2full_tb/DUT/lsb_tie_stages
 
 # ============================================================
 # Valid Pipeline Control
