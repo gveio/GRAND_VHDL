@@ -72,8 +72,8 @@ architecture pipeline_stage of bitonic_sorter_msb_last2full is
   end function;
 
   constant LOGN_MAX  : integer := int_log2_ceil(n_max);
-  constant MSB_NUM   : integer := 3; -- number of MSBs to consider for sorting
-  constant LSB_NUM   : integer := 2; -- tie-break bits
+  constant MSB_NUM   : integer := 3;            -- number of MSBs to consider for sorting
+  constant LSB_NUM   : integer := 2;            -- tie-break bits
   constant TIE_START : integer := LOGN_MAX - 2; -- stage from which we start full-precision comparison using reconstructed LSBs
 
   -- Type definitions
@@ -84,21 +84,22 @@ architecture pipeline_stage of bitonic_sorter_msb_last2full is
   -- Stage arrays(each stage takes the output of the previous one as its input)
   type mag_stage_array is array (0 to LOGN_MAX) of mag_array; --stores the LLR magnitudes of all sorting stages(2D array [stage][element])
   type index_stage_array is array (0 to LOGN_MAX) of index_array; --stores the index order evolution through stages(2D array [stage][index])
-  type lsb_stage_array is array (0 to LOGN_MAX) of lsb_array; -- stores only late-stage LSB pipeline (2D array [stage][element])
+  -- only late-stage LSB storage
+  type lsb_tie_stage_array is array (TIE_START + 1 to LOGN_MAX) of lsb_array;
   -- Mask for which lanes belong to the rounded-up power-of-two (n_effective)
   type mask_array is array (0 to n_max - 1) of std_logic;
   signal active_mask : mask_array := (others => '0');
 
   -- Signals
-  signal mag_stages  : mag_stage_array;                                                    -- main data pipeline of the sorter
-  signal idx_stages  : index_stage_array;                                                  -- companion pipeline for the permutation vector
-  signal lsb_stages  : lsb_stage_array;                                                    -- local low-bit pipeline used only for the last two full-precision stages
-  signal lsb_lut     : lsb_array                           := (others => (others => '0')); -- LUT to hold the LSBs of the input magnitudes for full-precision comparison (only used in the last two stages)
-  signal stage_valid : std_logic_vector(LOGN_MAX downto 0) := (others => '0');             -- marks which stage has valid data (shift register for latency tracking)
-  signal done_sort_r : std_logic                           := '0';                         -- register flag for done_sort output
-  signal n_r         : integer range 0 to n_max            := 0;                           -- Registered version of runtime parameter n
-  signal load_en     : std_logic                           := '0';                         -- signal to enable loading of new data
-  signal sort_en_d   : std_logic                           := '0';                         -- delayed version of sort_en to create a load enable pulse one cycle after sort_en goes high
+  signal mag_stages     : mag_stage_array;                                                    -- main data pipeline of the sorter
+  signal idx_stages     : index_stage_array;                                                  -- companion pipeline for the permutation vector
+  signal lsb_tie_stages : lsb_tie_stage_array;                                                -- local low-bit pipeline used only for the last two full-precision stages
+  signal lsb_lut        : lsb_array                           := (others => (others => '0')); -- LUT to hold the LSBs of the input magnitudes for full-precision comparison (only used in the last two stages)
+  signal stage_valid    : std_logic_vector(LOGN_MAX downto 0) := (others => '0');             -- marks which stage has valid data (shift register for latency tracking)
+  signal done_sort_r    : std_logic                           := '0';                         -- register flag for done_sort output
+  signal n_r            : integer range 0 to n_max            := 0;                           -- Registered version of runtime parameter n
+  signal load_en        : std_logic                           := '0';                         -- signal to enable loading of new data
+  signal sort_en_d      : std_logic                           := '0';                         -- delayed version of sort_en to create a load enable pulse one cycle after sort_en goes high
 
 begin
   -- output flag when sorting is done
@@ -145,8 +146,7 @@ begin
       for i in 0 to n_max - 1 loop
         mag_stages(0)(i) <= (others => '0');
         idx_stages(0)(i) <= (others => '0');
-        lsb_stages(0)(i) <= (others => '0');
-        lsb_lut(i)       <= (others => '0');
+        lsb_lut(i) <= (others => '0');
       end loop;
 
     elsif rising_edge(clk) then
@@ -198,30 +198,113 @@ begin
     end if;
   end process;
 
-  -- Bitonic stages (MSB-only compare in early stages and full-precision comparison in the last two stages)
-  -- Generate all Bitonic sorting stages
-  gen_stages: for s in 0 to LOGN_MAX - 1 generate --generate loop (the stages log2n)
-    constant TIE_STAGE : boolean := (s >= TIE_START); -- enable full-precision comparison in the last two stages
+  -- EARLY STAGES: MSB-only hardware
+  -- No LSB signals at all here.
+  gen_early_stages: if TIE_START > 0 generate
+    gen_early: for s in 0 to TIE_START - 1 generate
+    begin
+      process (clk, rst)
+        variable dist         : integer;                      --Distance between elements to be compared in that substage [ 2**(s-k) ]
+        variable seq_len      : integer;                      --Length of the current bitonic sequence being sorted (ascending or descending) [ 2**(s+1) ]
+        variable partner      : integer range 0 to n_max - 1; --Index of the element being compared with the current one
+        variable dir_asc      : boolean;
+        variable mag_a, mag_b : unsigned(MSB_NUM - 1 downto 0);
+        variable idx_a, idx_b : unsigned(WIDTH_INDICES - 1 downto 0);
+        variable tmp_mag      : mag_array;
+        variable tmp_idx      : index_array;
+        variable do_swap      : boolean;
+      begin
+        if (rst = '1') then
+          for i in 0 to n_max - 1 loop
+            mag_stages(s + 1)(i) <= (others => '0');
+            idx_stages(s + 1)(i) <= (others => '0');
+          end loop;
+
+        elsif rising_edge(clk) then
+
+          -- default pass-through from previous stage
+          for i in 0 to n_max - 1 loop
+            tmp_mag(i) := mag_stages(s)(i);
+            tmp_idx(i) := idx_stages(s)(i);
+          end loop;
+
+          if stage_valid(s) = '1' then
+            -- this stage corresponds to bitonic sequence length 2**(s+1)
+            seq_len := 2 ** (s + 1);
+
+            -- walk substages k = 0..s (combinational), with dist = 2**(s-k)
+            for k in 0 to s loop
+              dist := 2 ** (s - k);
+
+              --only operate once per pair: when (i and dist)=0
+              for i in 0 to n_max - 1 loop
+
+                if active_mask(i) = '1' then
+
+                  partner := to_integer(unsigned(to_unsigned(i, WIDTH_INDICES) xor to_unsigned(dist, WIDTH_INDICES))); -- partner = i xor dist
+                  dir_asc := (i mod (2 * seq_len)) < seq_len; -- same logic as dir_asc = (i and seq_len) = 0 -> Ascending direction for the first half of each bitonic sequence
+
+                  -- Only perform compare & swap (ascending / descending) on active elements
+                  if (active_mask(partner) = '1') and (unsigned(to_unsigned(i, WIDTH_INDICES) and to_unsigned(dist, WIDTH_INDICES)) = 0) then
+                    -- (i and dist = 0) process only one member of each XOR group (the one whose dist-bit is 0),while (partner > i) duplicate pairs
+
+                    -- read current working buffers
+                    mag_a := tmp_mag(i);
+                    mag_b := tmp_mag(partner);
+                    idx_a := tmp_idx(i);
+                    idx_b := tmp_idx(partner);
+
+                    if dir_asc then -- if ascending
+                      do_swap := mag_a > mag_b;
+                    else -- if descending
+                      do_swap := mag_a < mag_b;
+                    end if;
+
+                    if do_swap then
+                      tmp_mag(i) := mag_b;
+                      tmp_mag(partner) := mag_a;
+                      tmp_idx(i) := idx_b;
+                      tmp_idx(partner) := idx_a;
+                    end if;
+
+                  end if;
+                end if;
+              end loop;
+            end loop;
+            -- register stage output
+            for j in 0 to n_max - 1 loop
+              mag_stages(s + 1)(j) <= tmp_mag(j);
+              idx_stages(s + 1)(j) <= tmp_idx(j);
+            end loop;
+          end if;
+
+        end if;
+      end process;
+    end generate;
+  end generate;
+
+  -- LATE STAGES: only last two stages have LSB hardware
+  gen_tie_stages: for s in TIE_START to LOGN_MAX - 1 generate
   begin
     process (clk, rst)
-      variable dist         : integer;                      --Distance between elements to be compared in that substage [ 2**(s-k) ]
-      variable seq_len      : integer;                      --Length of the current bitonic sequence being sorted (ascending or descending) [ 2**(s+1) ]
-      variable partner      : integer range 0 to n_max - 1; --Index of the element being compared with the current one
-      variable dir_asc      : boolean;
-      variable mag_a, mag_b : unsigned(MSB_NUM - 1 downto 0);
-      variable idx_a, idx_b : unsigned(WIDTH_INDICES - 1 downto 0);
-      variable tmp_mag      : mag_array;
-      variable tmp_idx      : index_array;
-      variable tmp_lsb      : lsb_array;
-      variable lsb_a, lsb_b : unsigned(LSB_NUM - 1 downto 0);
-      variable do_swap      : boolean;
+      variable dist           : integer;                      --Distance between elements to be compared in that substage [ 2**(s-k) ]
+      variable seq_len        : integer;                      --Length of the current bitonic sequence being sorted (ascending or descending) [ 2**(s+1) ]
+      variable partner        : integer range 0 to n_max - 1; --Index of the element being compared with the current one
+      variable dir_asc        : boolean;
+      variable mag_a, mag_b   : unsigned(MSB_NUM - 1 downto 0);
+      variable idx_a, idx_b   : unsigned(WIDTH_INDICES - 1 downto 0);
+      variable tmp_mag        : mag_array;
+      variable tmp_idx        : index_array;
+      variable tmp_lsb        : lsb_array;
+      variable lsb_a, lsb_b   : unsigned(LSB_NUM - 1 downto 0);
+      variable do_swap        : boolean;
       variable full_a, full_b : unsigned(B_mag - 1 downto 0);
     begin
       if (rst = '1') then
         for i in 0 to n_max - 1 loop
           mag_stages(s + 1)(i) <= (others => '0');
           idx_stages(s + 1)(i) <= (others => '0');
-          lsb_stages(s + 1)(i) <= (others => '0');
+          lsb_tie_stages(s + 1)(i) <= (others => '0');
         end loop;
 
       elsif rising_edge(clk) then
@@ -231,12 +314,10 @@ begin
           tmp_mag(i) := mag_stages(s)(i);
           tmp_idx(i) := idx_stages(s)(i);
 
-          if TIE_STAGE then
-            if s = TIE_START then
-              tmp_lsb(i) := lsb_lut(to_integer(idx_stages(s)(i)));
-            else
-              tmp_lsb(i) := lsb_stages(s)(i);
-            end if;
+          if s = TIE_START then
+            tmp_lsb(i) := lsb_lut(to_integer(idx_stages(s)(i)));
+          else
+            tmp_lsb(i) := lsb_tie_stages(s)(i);
           end if;
         end loop;
 
@@ -265,45 +346,26 @@ begin
                   mag_b := tmp_mag(partner);
                   idx_a := tmp_idx(i);
                   idx_b := tmp_idx(partner);
-
-                  if TIE_STAGE then
-                    lsb_a := tmp_lsb(i);
-                    lsb_b := tmp_lsb(partner);
-                    full_a := mag_a & lsb_a;
-                    full_b := mag_b & lsb_b;
-                  else
-                    lsb_a := (others => '0');
-                    lsb_b := (others => '0');
-                    full_a := (others => '0');
-                    full_b := (others => '0');
-                  end if;
+                  lsb_a := tmp_lsb(i);
+                  lsb_b := tmp_lsb(partner);
+                  full_a := mag_a & lsb_a;
+                  full_b := mag_b & lsb_b;
 
                   if dir_asc then
-                    if TIE_STAGE then
-                      do_swap := (full_a > full_b);
-                    else
-                      do_swap := (mag_a > mag_b);
-                    end if;
+                    do_swap := (full_a > full_b);
                   else
-                    if TIE_STAGE then
-                      do_swap := (full_a < full_b);
-                    else
-                      do_swap := (mag_a < mag_b);
-                    end if;
+                    do_swap := (full_a < full_b);
                   end if;
 
-                 if do_swap then
+                  if do_swap then
                     tmp_mag(i) := mag_b;
                     tmp_mag(partner) := mag_a;
                     tmp_idx(i) := idx_b;
                     tmp_idx(partner) := idx_a;
-
-                    if TIE_STAGE then
-                      tmp_lsb(i) := lsb_b;
-                      tmp_lsb(partner) := lsb_a;
-                    end if;
-                 
+                    tmp_lsb(i) := lsb_b;
+                    tmp_lsb(partner) := lsb_a;
                   end if;
+
                 end if;
               end if;
             end loop;
@@ -312,10 +374,7 @@ begin
           for j in 0 to n_max - 1 loop
             mag_stages(s + 1)(j) <= tmp_mag(j);
             idx_stages(s + 1)(j) <= tmp_idx(j);
-
-            if TIE_STAGE then
-              lsb_stages(s + 1)(j) <= tmp_lsb(j);
-            end if;
+            lsb_tie_stages(s + 1)(j) <= tmp_lsb(j);
           end loop;
         end if;
 
