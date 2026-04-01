@@ -6,7 +6,7 @@ library ieee;
   -- PIPELINED IN LOGN;
   -- SORTER USING MSB-ONLY COMPARISON WITH FULL PRECISION IN THE LAST TWO STAGES;
 
-entity bitonic_sorter_msb is
+entity bitonic_sorter_msb_last2full is
   generic (
     n_max  : integer := 256;
     B_mag  : integer := 5;
@@ -22,7 +22,7 @@ entity bitonic_sorter_msb is
   );
 end entity;
 
-architecture pipeline_stage of bitonic_sorter_msb is
+architecture pipeline_stage of bitonic_sorter_msb_last2full is
 
   -- Function to round n up to next power of two
   function ceil_pow2(x : integer) return integer is
@@ -195,10 +195,10 @@ begin
     end if;
   end process;
 
-  -- Bitonic stages (MSB-only compare with tie-breaking in the last stages using LSBs)
+  -- Bitonic stages (MSB-only compare in early stages and full-precision comparison in the last two stages)
   -- Generate all Bitonic sorting stages
   gen_stages: for s in 0 to LOGN_MAX - 1 generate --generate loop (the stages log2n)
-    constant TIE_STAGE : boolean := (s >= LOGN_MAX - 2); -- enable tie-breaking only in the last two stages
+    constant TIE_STAGE : boolean := (s >= LOGN_MAX - 2); -- enable full-precision comparison in the last two stages
   begin
     process (clk, rst)
       variable dist         : integer;                      --Distance between elements to be compared in that substage [ 2**(s-k) ]
