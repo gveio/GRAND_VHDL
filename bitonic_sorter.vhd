@@ -147,7 +147,7 @@ begin
         for i in 0 to n_max - 1 loop
           if i < n_r then
             mag_stages(0)(i) <= unsigned(LLR_mag((i + 1) * B_mag - 1 downto i * B_mag));
-            idx_stages(0)(i) <= to_unsigned(i, WIDTH_INDICES); -- zero-extend the MSBs to match log2(n_max) width and not log2(n)
+            idx_stages(0)(i) <= to_unsigned(i, WIDTH_INDICES); -- initialize permutation indices
           elsif active_mask(i) = '1' then -- i < n_effective 
             mag_stages(0)(i) <= (others => '1'); -- pad with max value (11111 = 31)
             idx_stages(0)(i) <= to_unsigned(i, WIDTH_INDICES); -- keep unique index
