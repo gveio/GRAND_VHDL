@@ -263,21 +263,21 @@ begin
                     do_swap := (mag_a < mag_b) or (TIE_STAGE and (mag_a = mag_b) and (lsb_a < lsb_b));
                   end if;
 
-                    if do_swap then
-                      tmp_mag(i) := mag_b;
-                      tmp_mag(partner) := mag_a;
-                      tmp_idx(i) := idx_b;
-                      tmp_idx(partner) := idx_a;
-                      tmp_lsb(i) := lsb_b;
-                      tmp_lsb(partner) := lsb_a;
-                    else
-                      tmp_mag(i) := mag_a;
-                      tmp_mag(partner) := mag_b;
-                      tmp_idx(i) := idx_a;
-                      tmp_idx(partner) := idx_b;
-                      tmp_lsb(i) := lsb_a;
-                      tmp_lsb(partner) := lsb_b;
-                    end if;
+                  if do_swap then
+                    tmp_mag(i) := mag_b;
+                    tmp_mag(partner) := mag_a;
+                    tmp_idx(i) := idx_b;
+                    tmp_idx(partner) := idx_a;
+                    tmp_lsb(i) := lsb_b;
+                    tmp_lsb(partner) := lsb_a;
+                  else
+                    tmp_mag(i) := mag_a;
+                    tmp_mag(partner) := mag_b;
+                    tmp_idx(i) := idx_a;
+                    tmp_idx(partner) := idx_b;
+                    tmp_lsb(i) := lsb_a;
+                    tmp_lsb(partner) := lsb_b;
+                  end if;
                 end if;
               end if;
             end loop;
