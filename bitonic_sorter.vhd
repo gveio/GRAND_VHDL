@@ -251,11 +251,6 @@ begin
                     tmp_mag(partner) := mag_a;
                     tmp_idx(i) := idx_b;
                     tmp_idx(partner) := idx_a;
-                  else
-                    tmp_mag(i) := mag_a;
-                    tmp_mag(partner) := mag_b;
-                    tmp_idx(i) := idx_a;
-                    tmp_idx(partner) := idx_b;
                   end if;
                 end if;
               end if;
