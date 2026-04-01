@@ -136,7 +136,7 @@ begin
 
   load_en <= sort_en_d;
 
-  -- Stage 0 (load LLR magnitudes,initialize indices)
+  -- Stage 0 (load LLR MSBs, LSBs, initialize indices)
   process (clk, rst)
   begin
     if (rst = '1') then
@@ -195,7 +195,7 @@ begin
     end if;
   end process;
 
-  -- Bitonic stages (MSB-only compare)
+  -- Bitonic stages (MSB-only compare with tie-breaking in the last stages using LSBs)
   -- Generate all Bitonic sorting stages
   gen_stages: for s in 0 to LOGN_MAX - 1 generate --generate loop (the stages log2n)
     constant TIE_STAGE : boolean := (s >= LOGN_MAX - 2); -- enable tie-breaking only in the last two stages
@@ -211,6 +211,7 @@ begin
       variable tmp_idx      : index_array;
       variable tmp_lsb      : lsb_array;
       variable lsb_a, lsb_b : unsigned(LSB_NUM - 1 downto 0);
+      variable do_swap      : boolean;
     begin
       if (rst = '1') then
         for i in 0 to n_max - 1 loop
@@ -257,23 +258,12 @@ begin
                   lsb_b := tmp_lsb(partner);
 
                   if dir_asc then -- if ascending
-                    if (mag_a > mag_b) or (TIE_STAGE and (mag_a = mag_b) and (lsb_a > lsb_b)) then
-                      tmp_mag(i) := mag_b;
-                      tmp_mag(partner) := mag_a;
-                      tmp_idx(i) := idx_b;
-                      tmp_idx(partner) := idx_a;
-                      tmp_lsb(i) := lsb_b;
-                      tmp_lsb(partner) := lsb_a;
-                    else
-                      tmp_mag(i) := mag_a;
-                      tmp_mag(partner) := mag_b;
-                      tmp_idx(i) := idx_a;
-                      tmp_idx(partner) := idx_b;
-                      tmp_lsb(i) := lsb_a;
-                      tmp_lsb(partner) := lsb_b;
-                    end if;
+                    do_swap := (mag_a > mag_b) or (TIE_STAGE and (mag_a = mag_b) and (lsb_a > lsb_b));
                   else -- if descending
-                    if (mag_a < mag_b) or (TIE_STAGE and (mag_a = mag_b) and (lsb_a < lsb_b)) then
+                    do_swap := (mag_a < mag_b) or (TIE_STAGE and (mag_a = mag_b) and (lsb_a < lsb_b));
+                  end if;
+
+                    if do_swap then
                       tmp_mag(i) := mag_b;
                       tmp_mag(partner) := mag_a;
                       tmp_idx(i) := idx_b;
@@ -288,7 +278,6 @@ begin
                       tmp_lsb(i) := lsb_a;
                       tmp_lsb(partner) := lsb_b;
                     end if;
-                  end if;
                 end if;
               end if;
             end loop;

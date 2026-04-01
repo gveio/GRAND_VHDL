@@ -195,6 +195,7 @@ begin
       variable idx_a, idx_b : unsigned(WIDTH_INDICES - 1 downto 0);
       variable tmp_mag      : mag_array;
       variable tmp_idx      : index_array;
+      variable do_swap      : boolean;
     begin
       if (rst = '1') then
         for i in 0 to n_max - 1 loop
@@ -235,31 +236,23 @@ begin
                   mag_b := tmp_mag(partner);
                   idx_a := tmp_idx(i);
                   idx_b := tmp_idx(partner);
-
+                  
                   if dir_asc then -- if ascending
-                    if mag_a > mag_b then
-                      tmp_mag(i) := mag_b;
-                      tmp_mag(partner) := mag_a;
-                      tmp_idx(i) := idx_b;
-                      tmp_idx(partner) := idx_a;
-                    else
-                      tmp_mag(i) := mag_a;
-                      tmp_mag(partner) := mag_b;
-                      tmp_idx(i) := idx_a;
-                      tmp_idx(partner) := idx_b;
-                    end if;
+                    do_swap := mag_a > mag_b;
                   else -- if descending
-                    if mag_a < mag_b then
-                      tmp_mag(i) := mag_b;
-                      tmp_mag(partner) := mag_a;
-                      tmp_idx(i) := idx_b;
-                      tmp_idx(partner) := idx_a;
-                    else
-                      tmp_mag(i) := mag_a;
-                      tmp_mag(partner) := mag_b;
-                      tmp_idx(i) := idx_a;
-                      tmp_idx(partner) := idx_b;
-                    end if;
+                    do_swap := mag_a < mag_b;
+                  end if;
+
+                  if do_swap then
+                    tmp_mag(i) := mag_b;
+                    tmp_mag(partner) := mag_a;
+                    tmp_idx(i) := idx_b;
+                    tmp_idx(partner) := idx_a;
+                  else
+                    tmp_mag(i) := mag_a;
+                    tmp_mag(partner) := mag_b;
+                    tmp_idx(i) := idx_a;
+                    tmp_idx(partner) := idx_b;
                   end if;
                 end if;
               end if;
