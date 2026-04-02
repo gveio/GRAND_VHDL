@@ -24,29 +24,6 @@ end entity;
 
 architecture pipeline_stage of bitonic_sorter_msb is
 
-  function ceil_pow2(x : integer) return integer is
-  begin
-    if x <= 1 then
-      return 1;
-    elsif x <= 2 then
-      return 2;
-    elsif x <= 4 then
-      return 4;
-    elsif x <= 8 then
-      return 8;
-    elsif x <= 16 then
-      return 16;
-    elsif x <= 32 then
-      return 32;
-    elsif x <= 64 then
-      return 64;
-    elsif x <= 128 then
-      return 128;
-    else
-      return 256;
-    end if;
-  end function;
-
   function int_log2_ceil(x : integer) return integer is
   begin
     if x <= 1 then
@@ -83,14 +60,10 @@ architecture pipeline_stage of bitonic_sorter_msb is
   type index_stage_array is array (0 to LOGN_MAX) of index_array;
   type lsb_stage_array   is array (0 to LOGN_MAX) of lsb_array;
 
-  type mask_array is array (0 to n_max - 1) of std_logic;
-
-  signal active_mask : mask_array := (others => '0');
-
   signal mag_stages  : mag_stage_array;
   signal idx_stages  : index_stage_array;
   signal lsb_stages  : lsb_stage_array;
-  signal stage_valid : std_logic_vector(LOGN_MAX downto 0) := (others => '0');
+  signal stage_valid : std_logic_vector(LOGN_MAX+2 downto 0) := (others => '0');
   signal done_sort_r : std_logic := '0';
   signal n_r         : integer range 0 to n_max := 0;
   signal load_en     : std_logic := '0';
@@ -104,24 +77,12 @@ begin
   -- runtime configuration
   --------------------------------------------------------------------------
   process(clk, rst)
-    variable n_effective : integer range 0 to n_max;
   begin
     if rst = '1' then
       n_r <= 0;
-      active_mask <= (others => '0');
-
     elsif rising_edge(clk) then
       if sort_en = '1' then
         n_r <= n;
-        n_effective := ceil_pow2(n);
-
-        for i in 0 to n_max - 1 loop
-          if i < n_effective then
-            active_mask(i) <= '1';
-          else
-            active_mask(i) <= '0';
-          end if;
-        end loop;
       end if;
     end if;
   end process;
@@ -156,14 +117,10 @@ begin
             mag_stages(0)(i) <= unsigned(LLR_mag((i + 1) * B_mag - 1 downto (i + 1) * B_mag - MSB_NUM));
             idx_stages(0)(i) <= to_unsigned(i, WIDTH_INDICES);
             lsb_stages(0)(i) <= unsigned(LLR_mag(i * B_mag + (LSB_NUM - 1) downto i * B_mag));
-          elsif active_mask(i) = '1' then
+          else
             mag_stages(0)(i) <= (others => '1');
             idx_stages(0)(i) <= to_unsigned(i, WIDTH_INDICES);
             lsb_stages(0)(i) <= (others => '1');
-          else
-            mag_stages(0)(i) <= (others => '0');
-            idx_stages(0)(i) <= (others => '0');
-            lsb_stages(0)(i) <= (others => '0');
           end if;
         end loop;
       end if;
@@ -183,21 +140,20 @@ begin
       done_sort_r <= '0';
       stage_valid(0) <= load_en;
 
-      for s in 1 to LOGN_MAX loop
+      for s in 1 to LOGN_MAX+2 loop
         stage_valid(s) <= stage_valid(s - 1);
       end loop;
 
-      if stage_valid(LOGN_MAX) = '1' then
+      if stage_valid(LOGN_MAX+2) = '1' then
         done_sort_r <= '1';
       end if;
     end if;
   end process;
 
   --------------------------------------------------------------------------
-  -- all stages: propagate mag + idx + lsb, but only use lsb compare late
+  -- EARLY stages: propagate mag + idx + lsb
   --------------------------------------------------------------------------
-  gen_stages : for s in 0 to LOGN_MAX - 1 generate
-    constant TIE_STAGE : boolean := (s >= TIE_START);
+  gen_stages : for s in 0 to TIE_START - 1 generate
   begin
     process(clk, rst)
       variable dist         : integer;
@@ -233,12 +189,10 @@ begin
             dist := 2 ** (s - k);
 
             for i in 0 to n_max - 1 loop
-              if active_mask(i) = '1' then
                 partner := to_integer(unsigned(to_unsigned(i, WIDTH_INDICES) xor to_unsigned(dist, WIDTH_INDICES)));
                 dir_asc := (i mod (2 * seq_len)) < seq_len;
 
-                if (active_mask(partner) = '1') and
-                   (unsigned(to_unsigned(i, WIDTH_INDICES) and to_unsigned(dist, WIDTH_INDICES)) = 0) then
+                if (unsigned(to_unsigned(i, WIDTH_INDICES) and to_unsigned(dist, WIDTH_INDICES)) = 0) then
 
                   mag_a := tmp_mag(i);
                   mag_b := tmp_mag(partner);
@@ -248,17 +202,9 @@ begin
                   lsb_b := tmp_lsb(partner);
 
                   if dir_asc then
-                    if TIE_STAGE then
-                      do_swap := (mag_a > mag_b) or ((mag_a = mag_b) and (lsb_a > lsb_b));
-                    else
-                      do_swap := (mag_a > mag_b);
-                    end if;
+                    do_swap := (mag_a > mag_b);
                   else
-                    if TIE_STAGE then
-                      do_swap := (mag_a < mag_b) or ((mag_a = mag_b) and (lsb_a < lsb_b));
-                    else
-                      do_swap := (mag_a < mag_b);
-                    end if;
+                    do_swap := (mag_a < mag_b);
                   end if;
 
                   if do_swap then
@@ -271,7 +217,6 @@ begin
                   end if;
 
                 end if;
-              end if;
             end loop;
           end loop;
 
