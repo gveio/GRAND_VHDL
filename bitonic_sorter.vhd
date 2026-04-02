@@ -22,30 +22,6 @@ end entity;
 
 architecture pipeline_stage of bitonic_sorter is
 
-  -- Function to round n up to next power of two
-  function ceil_pow2(x : integer) return integer is
-  begin
-    if x <= 1 then
-      return 1;
-    elsif x <= 2 then
-      return 2;
-    elsif x <= 4 then
-      return 4;
-    elsif x <= 8 then
-      return 8;
-    elsif x <= 16 then
-      return 16;
-    elsif x <= 32 then
-      return 32;
-    elsif x <= 64 then
-      return 64;
-    elsif x <= 128 then
-      return 128;
-    else
-      return 256;
-    end if;
-  end function;
-
   function int_log2_ceil(x : integer) return integer is
   begin
     if x <= 1 then
@@ -80,10 +56,6 @@ architecture pipeline_stage of bitonic_sorter is
   type mag_stage_array is array (0 to LOGN_MAX) of mag_array; --stores the LLR magnitudes of all sorting stages(2D array [stage][element])
   type index_stage_array is array (0 to LOGN_MAX) of index_array; --stores the index order evolution through stages(2D array [stage][index])
 
-  -- Mask for which lanes belong to the rounded-up power-of-two (n_effective)
-  type mask_array is array (0 to n_max - 1) of std_logic;
-  signal active_mask : mask_array := (others => '0');
-
   -- Signals
   signal mag_stages  : mag_stage_array;                                        -- main data pipeline of the sorter
   signal idx_stages  : index_stage_array;                                      -- companion pipeline for the permutation vector
@@ -99,23 +71,13 @@ begin
 
   -- Configuration + active mask
   process (clk, rst)
-    variable n_effective : integer range 0 to n_max; -- n rounded up to power-of-two
   begin
     if rst = '1' then
       n_r <= 0;
-      active_mask <= (others => '0');
 
     elsif rising_edge(clk) then
       if sort_en = '1' then
         n_r <= n;
-        n_effective := ceil_pow2(n);
-        for i in 0 to n_max - 1 loop
-          if i < n_effective then
-            active_mask(i) <= '1';
-          else
-            active_mask(i) <= '0';
-          end if;
-        end loop;
       end if;
     end if;
   end process;
@@ -147,13 +109,10 @@ begin
         for i in 0 to n_max - 1 loop
           if i < n_r then
             mag_stages(0)(i) <= unsigned(LLR_mag((i + 1) * B_mag - 1 downto i * B_mag));
-            idx_stages(0)(i) <= to_unsigned(i, WIDTH_INDICES); -- initialize permutation indices
-          elsif active_mask(i) = '1' then -- i < n_effective 
-            mag_stages(0)(i) <= (others => '1'); -- pad with max value (11111 = 31)
-            idx_stages(0)(i) <= to_unsigned(i, WIDTH_INDICES); -- keep unique index
+            idx_stages(0)(i) <= to_unsigned(i, WIDTH_INDICES);
           else
-            mag_stages(0)(i) <= (others => '0');
-            idx_stages(0)(i) <= (others => '0');
+            mag_stages(0)(i) <= (others => '1');  -- 31
+            idx_stages(0)(i) <= to_unsigned(i, WIDTH_INDICES);
           end if;
         end loop;
       end if;
@@ -225,13 +184,11 @@ begin
             --only operate once per pair: when (i and dist)=0
             for i in 0 to n_max - 1 loop
 
-              if active_mask(i) = '1' then
-
                 partner := to_integer(unsigned(to_unsigned(i, WIDTH_INDICES) xor to_unsigned(dist, WIDTH_INDICES))); -- partner = i xor dist
                 dir_asc := (i mod (2 * seq_len)) < seq_len; -- same logic as dir_asc = (i and seq_len) = 0 -> Ascending direction for the first half of each bitonic sequence
 
                 -- Only perform compare & swap (ascending / descending) on active elements
-                if (active_mask(partner) = '1') and (unsigned(to_unsigned(i, WIDTH_INDICES) and to_unsigned(dist, WIDTH_INDICES)) = 0) then
+                if (unsigned(to_unsigned(i, WIDTH_INDICES) and to_unsigned(dist, WIDTH_INDICES)) = 0) then
                   -- (i and dist = 0) process only one member of each XOR group (the one whose dist-bit is 0),while (partner > i) duplicate pairs
 
                   -- read current working buffers
@@ -253,7 +210,6 @@ begin
                     tmp_idx(partner) := idx_a;
                   end if;
                 end if;
-              end if;
             end loop;
           end loop;
           -- register stage output
