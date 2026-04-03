@@ -234,6 +234,7 @@ begin
     end process;
   end generate;
 
+-- Pipeline stage 6
 process(clk, rst)
   variable dist         : integer;
   variable seq_len      : integer;
@@ -282,7 +283,7 @@ begin
             lsb_a := tmp_lsb(i);
             lsb_b := tmp_lsb(partner);
 
-            if mag_a = mag_b then
+            if (k = 6) and (mag_a = mag_b) then
               tmp_tie(i)       := '1';
               tmp_tie(partner) := '1';
             end if;
@@ -315,6 +316,7 @@ begin
   end if;
 end process;
 
+-- Extra tie-breaking pipeline stage for ties happen in last CAE step of second last stage 
 process(clk, rst)
   variable dist         : integer;
   variable seq_len      : integer;
@@ -345,15 +347,13 @@ begin
     if stage_valid(7) = '1' then
       seq_len := 2 ** (6 + 1);
 
-      for k in 0 to 6 loop
-        dist := 2 ** (6 - k);
+        dist := 1;
 
         for i in 0 to n_max - 1 loop
           partner := to_integer(unsigned(to_unsigned(i, WIDTH_INDICES) xor to_unsigned(dist, WIDTH_INDICES)));
           dir_asc := (i mod (2 * seq_len)) < seq_len;
 
-          if (unsigned(to_unsigned(i, WIDTH_INDICES) and to_unsigned(dist, WIDTH_INDICES)) = 0) and
-             (tie_stage6(i) = '1') then
+          if (unsigned(to_unsigned(i, WIDTH_INDICES) and to_unsigned(dist, WIDTH_INDICES)) = 0) and (tie_stage6(i) = '1') then
 
             mag_a := tmp_mag(i);
             mag_b := tmp_mag(partner);
@@ -378,7 +378,6 @@ begin
             end if;
           end if;
         end loop;
-      end loop;
 
       for j in 0 to n_max - 1 loop
         mag_stages(8)(j) <= tmp_mag(j);
@@ -389,6 +388,7 @@ begin
   end if;
 end process;
 
+-- Pipeline stage 7
 process(clk, rst)
   variable dist         : integer;
   variable seq_len      : integer;
@@ -437,7 +437,7 @@ begin
             lsb_a := tmp_lsb(i);
             lsb_b := tmp_lsb(partner);
 
-            if mag_a = mag_b then
+            if (k = 7) and (mag_a = mag_b) then
               tmp_tie(i)       := '1';
               tmp_tie(partner) := '1';
             end if;
@@ -470,6 +470,7 @@ begin
   end if;
 end process;
 
+-- Extra tie-breaking pipeline stage for ties happen in last CAE step of last stage 
 process(clk, rst)
   variable dist         : integer;
   variable seq_len      : integer;
@@ -500,8 +501,7 @@ begin
     if stage_valid(9) = '1' then
       seq_len := 2 ** (7 + 1);
 
-      for k in 0 to 7 loop
-        dist := 2 ** (7 - k);
+        dist := 1;
 
         for i in 0 to n_max - 1 loop
           partner := to_integer(unsigned(to_unsigned(i, WIDTH_INDICES) xor to_unsigned(dist, WIDTH_INDICES)));
@@ -533,7 +533,6 @@ begin
             end if;
           end if;
         end loop;
-      end loop;
 
       for j in 0 to n_max - 1 loop
         mag_stages(10)(j) <= tmp_mag(j);
