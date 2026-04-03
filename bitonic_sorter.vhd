@@ -74,7 +74,6 @@ begin
   begin
     if rst = '1' then
       n_r <= 0;
-
     elsif rising_edge(clk) then
       if sort_en = '1' then
         n_r <= n;
