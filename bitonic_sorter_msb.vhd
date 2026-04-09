@@ -4,9 +4,9 @@ use ieee.numeric_std.all;
 use ieee.math_real.all;
 use work.config_pkg.all;
 -- PIPELINED IN LOGN;
--- SORTER USING MSB-ONLY WITH TIEBREAK IN LAST STAGES USING LSBs COMPARISON;
+-- SORTER USING MSB-ONLY COMPARISON WITH FULL PRECISION IN THE LAST TWO STAGES;
 
-entity bitonic_sorter_msb is
+entity bitonic_sorter_msb_last2full is
   generic (
     n_max  : integer := 256;
     B_mag  : integer := 5;
@@ -22,7 +22,7 @@ entity bitonic_sorter_msb is
   );
 end entity;
 
-architecture pipeline_stage of bitonic_sorter_msb is
+architecture pipeline_stage of bitonic_sorter_msb_last2full is
 
   function int_log2_ceil(x : integer) return integer is
   begin
@@ -49,7 +49,7 @@ architecture pipeline_stage of bitonic_sorter_msb is
 
   constant LOGN_MAX  : integer := int_log2_ceil(n_max);
   constant MSB_NUM   : integer := 3;
-  constant LSB_NUM   : integer := 2;
+  constant LSB_NUM   : integer := 1;
   constant TIE_START : integer := LOGN_MAX - 2;
 
   type mag_array   is array (0 to n_max - 1) of unsigned(MSB_NUM - 1 downto 0);
@@ -80,6 +80,7 @@ begin
   begin
     if rst = '1' then
       n_r <= 0;
+
     elsif rising_edge(clk) then
       if sort_en = '1' then
         n_r <= n;
@@ -116,9 +117,9 @@ begin
           if i < n_r then
             mag_stages(0)(i) <= unsigned(LLR_mag((i + 1) * B_mag - 1 downto (i + 1) * B_mag - MSB_NUM));
             idx_stages(0)(i) <= to_unsigned(i, WIDTH_INDICES);
-            lsb_stages(0)(i) <= unsigned(LLR_mag(i * B_mag + (LSB_NUM - 1) downto i * B_mag));
+            lsb_stages(0)(i) <= unsigned(LLR_mag(i * B_mag downto i * B_mag));
           else
-            mag_stages(0)(i) <= (others => '1');
+             mag_stages(0)(i) <= (others => '1');
             idx_stages(0)(i) <= to_unsigned(i, WIDTH_INDICES);
             lsb_stages(0)(i) <= (others => '1');
           end if;
@@ -151,23 +152,24 @@ begin
   end process;
 
   --------------------------------------------------------------------------
-  -- propagate mag + idx + lsb
+  -- all stages: propagate mag + idx + lsb, but only use full compare late
   --------------------------------------------------------------------------
-  gen_stages : for s in 0 to LOGN_MAX - 2 generate
-  constant TIE_STAGE : boolean := (s >= TIE_START);
+  gen_stages : for s in 0 to LOGN_MAX - 1 generate
+    constant TIE_STAGE : boolean := (s >= TIE_START);
   begin
     process(clk, rst)
-      variable dist         : integer;
-      variable seq_len      : integer;
-      variable partner      : integer range 0 to n_max - 1;
-      variable dir_asc      : boolean;
-      variable mag_a, mag_b : unsigned(MSB_NUM - 1 downto 0);
-      variable idx_a, idx_b : unsigned(WIDTH_INDICES - 1 downto 0);
-      variable lsb_a, lsb_b : unsigned(LSB_NUM - 1 downto 0);
-      variable tmp_mag      : mag_array;
-      variable tmp_idx      : index_array;
-      variable tmp_lsb      : lsb_array;
-      variable do_swap      : boolean;
+      variable dist           : integer;
+      variable seq_len        : integer;
+      variable partner        : integer range 0 to n_max - 1;
+      variable dir_asc        : boolean;
+      variable mag_a, mag_b   : unsigned(MSB_NUM - 1 downto 0);
+      variable idx_a, idx_b   : unsigned(WIDTH_INDICES - 1 downto 0);
+      variable lsb_a, lsb_b   : unsigned(LSB_NUM - 1 downto 0);
+      variable full_a, full_b : unsigned(B_mag - 1 downto 0);
+      variable tmp_mag        : mag_array;
+      variable tmp_idx        : index_array;
+      variable tmp_lsb        : lsb_array;
+      variable do_swap        : boolean;
     begin
       if rst = '1' then
         for i in 0 to n_max - 1 loop
@@ -194,27 +196,30 @@ begin
                 dir_asc := (i mod (2 * seq_len)) < seq_len;
 
                 if (unsigned(to_unsigned(i, WIDTH_INDICES) and to_unsigned(dist, WIDTH_INDICES)) = 0) then
-				 
-					  mag_a := tmp_mag(i);
-					  mag_b := tmp_mag(partner);
-					  idx_a := tmp_idx(i);
-					  idx_b := tmp_idx(partner);
-					  lsb_a := tmp_lsb(i);
-					  lsb_b := tmp_lsb(partner);
 
-					if dir_asc then
-					  if TIE_STAGE then
-						do_swap := (mag_a > mag_b) or ((mag_a = mag_b) and (lsb_a > lsb_b));
-					  else
-						do_swap := (mag_a > mag_b);
-					  end if;
-					else
-					  if TIE_STAGE then
-						do_swap := (mag_a < mag_b) or ((mag_a = mag_b) and (lsb_a < lsb_b));
-					  else
-						do_swap := (mag_a < mag_b);
-					  end if;
-					end if;
+                  mag_a := tmp_mag(i);
+                  mag_b := tmp_mag(partner);
+                  idx_a := tmp_idx(i);
+                  idx_b := tmp_idx(partner);
+                  lsb_a := tmp_lsb(i);
+                  lsb_b := tmp_lsb(partner);
+
+                        if TIE_STAGE then
+                            full_a := mag_a & lsb_a;
+                            full_b := mag_b & lsb_b;
+
+                            if dir_asc then
+                                do_swap := (full_a > full_b);
+                            else
+                                do_swap := (full_a < full_b);
+                            end if;
+                        else
+                            if dir_asc then
+                                do_swap := (mag_a > mag_b);
+                            else
+                                do_swap := (mag_a < mag_b);
+                            end if;
+                        end if;
 
 					  if do_swap then
 						tmp_mag(i) := mag_b;
@@ -238,283 +243,8 @@ begin
       end if;
     end process;
   end generate;
-  
- final_stage_pruned : process(clk, rst)
-  variable dist         : integer;
-  variable partner      : integer range 0 to n_max - 1;
-  variable dir_asc      : boolean;
-  variable mag_a, mag_b : unsigned(MSB_NUM - 1 downto 0);
-  variable idx_a, idx_b : unsigned(WIDTH_INDICES - 1 downto 0);
-  variable lsb_a, lsb_b : unsigned(LSB_NUM - 1 downto 0);
-  variable tmp_mag      : mag_array;
-  variable tmp_idx      : index_array;
-  variable tmp_lsb      : lsb_array;
-  variable do_swap      : boolean;
-begin
-  if rst = '1' then
-    for i in 0 to n_max - 1 loop
-      mag_stages(LOGN_MAX)(i) <= (others => '0');
-      idx_stages(LOGN_MAX)(i) <= (others => '0');
-      lsb_stages(LOGN_MAX)(i) <= (others => '0');
-    end loop;
 
-  elsif rising_edge(clk) then
-    for i in 0 to n_max - 1 loop
-      tmp_mag(i) := mag_stages(LOGN_MAX - 1)(i);
-      tmp_idx(i) := idx_stages(LOGN_MAX - 1)(i);
-      tmp_lsb(i) := lsb_stages(LOGN_MAX - 1)(i);
-    end loop;
-
-    if stage_valid(LOGN_MAX - 1) = '1' then
-
-      ----------------------------------------------------------------------
-      -- dist = 128
-      ----------------------------------------------------------------------
-      dist := 128;
-      for i in 0 to n_max - 1 loop
-        partner := to_integer(unsigned(to_unsigned(i, WIDTH_INDICES) xor to_unsigned(dist, WIDTH_INDICES)));
-        dir_asc := true;
-
-        if ((to_unsigned(i, WIDTH_INDICES) and to_unsigned(dist, WIDTH_INDICES)) = to_unsigned(0, WIDTH_INDICES)) then
-          mag_a := tmp_mag(i);
-          mag_b := tmp_mag(partner);
-          idx_a := tmp_idx(i);
-          idx_b := tmp_idx(partner);
-          lsb_a := tmp_lsb(i);
-          lsb_b := tmp_lsb(partner);
-
-          do_swap := (mag_a > mag_b) or ((mag_a = mag_b) and (lsb_a > lsb_b));
-
-          if do_swap then
-            tmp_mag(i)       := mag_b;
-            tmp_mag(partner) := mag_a;
-            tmp_idx(i)       := idx_b;
-            tmp_idx(partner) := idx_a;
-            tmp_lsb(i)       := lsb_b;
-            tmp_lsb(partner) := lsb_a;
-          end if;
-        end if;
-      end loop;
-
-      ----------------------------------------------------------------------
-      -- dist = 64
-      ----------------------------------------------------------------------
-      dist := 64;
-      for i in 0 to n_max - 1 loop
-        partner := to_integer(unsigned(to_unsigned(i, WIDTH_INDICES) xor to_unsigned(dist, WIDTH_INDICES)));
-        dir_asc := true;
-
-        if ((to_unsigned(i, WIDTH_INDICES) and to_unsigned(dist, WIDTH_INDICES)) = to_unsigned(0, WIDTH_INDICES)) then
-          mag_a := tmp_mag(i);
-          mag_b := tmp_mag(partner);
-          idx_a := tmp_idx(i);
-          idx_b := tmp_idx(partner);
-          lsb_a := tmp_lsb(i);
-          lsb_b := tmp_lsb(partner);
-
-          do_swap := (mag_a > mag_b) or ((mag_a = mag_b) and (lsb_a > lsb_b));
-
-          if do_swap then
-            tmp_mag(i)       := mag_b;
-            tmp_mag(partner) := mag_a;
-            tmp_idx(i)       := idx_b;
-            tmp_idx(partner) := idx_a;
-            tmp_lsb(i)       := lsb_b;
-            tmp_lsb(partner) := lsb_a;
-          end if;
-        end if;
-      end loop;
-
-      ----------------------------------------------------------------------
-      -- dist = 32
-      ----------------------------------------------------------------------
-      dist := 32;
-      for i in 0 to n_max - 1 loop
-        partner := to_integer(unsigned(to_unsigned(i, WIDTH_INDICES) xor to_unsigned(dist, WIDTH_INDICES)));
-        dir_asc := true;
-
-        if ((to_unsigned(i, WIDTH_INDICES) and to_unsigned(dist, WIDTH_INDICES)) = to_unsigned(0, WIDTH_INDICES)) then
-          mag_a := tmp_mag(i);
-          mag_b := tmp_mag(partner);
-          idx_a := tmp_idx(i);
-          idx_b := tmp_idx(partner);
-          lsb_a := tmp_lsb(i);
-          lsb_b := tmp_lsb(partner);
-
-          do_swap := (mag_a > mag_b) or ((mag_a = mag_b) and (lsb_a > lsb_b));
-
-          if do_swap then
-            tmp_mag(i)       := mag_b;
-            tmp_mag(partner) := mag_a;
-            tmp_idx(i)       := idx_b;
-            tmp_idx(partner) := idx_a;
-            tmp_lsb(i)       := lsb_b;
-            tmp_lsb(partner) := lsb_a;
-          end if;
-        end if;
-      end loop;
-
-      ----------------------------------------------------------------------
-      -- dist = 16
-      ----------------------------------------------------------------------
-      dist := 16;
-      for i in 0 to n_max - 1 loop
-        partner := to_integer(unsigned(to_unsigned(i, WIDTH_INDICES) xor to_unsigned(dist, WIDTH_INDICES)));
-        dir_asc := true;
-
-        if ((to_unsigned(i, WIDTH_INDICES) and to_unsigned(dist, WIDTH_INDICES)) = to_unsigned(0, WIDTH_INDICES)) then
-          mag_a := tmp_mag(i);
-          mag_b := tmp_mag(partner);
-          idx_a := tmp_idx(i);
-          idx_b := tmp_idx(partner);
-          lsb_a := tmp_lsb(i);
-          lsb_b := tmp_lsb(partner);
-
-          do_swap := (mag_a > mag_b) or ((mag_a = mag_b) and (lsb_a > lsb_b));
-
-          if do_swap then
-            tmp_mag(i)       := mag_b;
-            tmp_mag(partner) := mag_a;
-            tmp_idx(i)       := idx_b;
-            tmp_idx(partner) := idx_a;
-            tmp_lsb(i)       := lsb_b;
-            tmp_lsb(partner) := lsb_a;
-          end if;
-        end if;
-      end loop;
-
-      ----------------------------------------------------------------------
-      -- dist = 8
-      ----------------------------------------------------------------------
-      dist := 8;
-      for i in 0 to n_max - 1 loop
-        partner := to_integer(unsigned(to_unsigned(i, WIDTH_INDICES) xor to_unsigned(dist, WIDTH_INDICES)));
-        dir_asc := true;
-
-        if ((to_unsigned(i, WIDTH_INDICES) and to_unsigned(dist, WIDTH_INDICES)) = to_unsigned(0, WIDTH_INDICES)) then
-          mag_a := tmp_mag(i);
-          mag_b := tmp_mag(partner);
-          idx_a := tmp_idx(i);
-          idx_b := tmp_idx(partner);
-          lsb_a := tmp_lsb(i);
-          lsb_b := tmp_lsb(partner);
-
-          do_swap := (mag_a > mag_b) or ((mag_a = mag_b) and (lsb_a > lsb_b));
-
-          if do_swap then
-            tmp_mag(i)       := mag_b;
-            tmp_mag(partner) := mag_a;
-            tmp_idx(i)       := idx_b;
-            tmp_idx(partner) := idx_a;
-            tmp_lsb(i)       := lsb_b;
-            tmp_lsb(partner) := lsb_a;
-          end if;
-        end if;
-      end loop;
-
-      ----------------------------------------------------------------------
-      -- dist = 4  (PRUNED OUTSIDE LW_MAX)
-      ----------------------------------------------------------------------
-      dist := 4;
-      for i in 0 to n_max - 1 loop
-        partner := to_integer(unsigned(to_unsigned(i, WIDTH_INDICES) xor to_unsigned(dist, WIDTH_INDICES)));
-        dir_asc := true;
-
-        if ((to_unsigned(i, WIDTH_INDICES) and to_unsigned(dist, WIDTH_INDICES)) = to_unsigned(0, WIDTH_INDICES)) then
-          if not ((i >= LW_MAX) and (partner >= LW_MAX)) then
-            mag_a := tmp_mag(i);
-            mag_b := tmp_mag(partner);
-            idx_a := tmp_idx(i);
-            idx_b := tmp_idx(partner);
-            lsb_a := tmp_lsb(i);
-            lsb_b := tmp_lsb(partner);
-
-            do_swap := (mag_a > mag_b) or ((mag_a = mag_b) and (lsb_a > lsb_b));
-
-            if do_swap then
-              tmp_mag(i)       := mag_b;
-              tmp_mag(partner) := mag_a;
-              tmp_idx(i)       := idx_b;
-              tmp_idx(partner) := idx_a;
-              tmp_lsb(i)       := lsb_b;
-              tmp_lsb(partner) := lsb_a;
-            end if;
-          end if;
-        end if;
-      end loop;
-
-      ----------------------------------------------------------------------
-      -- dist = 2  (PRUNED OUTSIDE LW_MAX)
-      ----------------------------------------------------------------------
-      dist := 2;
-      for i in 0 to n_max - 1 loop
-        partner := to_integer(unsigned(to_unsigned(i, WIDTH_INDICES) xor to_unsigned(dist, WIDTH_INDICES)));
-        dir_asc := true;
-
-        if ((to_unsigned(i, WIDTH_INDICES) and to_unsigned(dist, WIDTH_INDICES)) = to_unsigned(0, WIDTH_INDICES)) then
-          if not ((i >= LW_MAX) and (partner >= LW_MAX)) then
-            mag_a := tmp_mag(i);
-            mag_b := tmp_mag(partner);
-            idx_a := tmp_idx(i);
-            idx_b := tmp_idx(partner);
-            lsb_a := tmp_lsb(i);
-            lsb_b := tmp_lsb(partner);
-
-            do_swap := (mag_a > mag_b) or ((mag_a = mag_b) and (lsb_a > lsb_b));
-
-            if do_swap then
-              tmp_mag(i)       := mag_b;
-              tmp_mag(partner) := mag_a;
-              tmp_idx(i)       := idx_b;
-              tmp_idx(partner) := idx_a;
-              tmp_lsb(i)       := lsb_b;
-              tmp_lsb(partner) := lsb_a;
-            end if;
-          end if;
-        end if;
-      end loop;
-
-      ----------------------------------------------------------------------
-      -- dist = 1  (PRUNED OUTSIDE LW_MAX)
-      ----------------------------------------------------------------------
-      dist := 1;
-      for i in 0 to n_max - 1 loop
-        partner := to_integer(unsigned(to_unsigned(i, WIDTH_INDICES) xor to_unsigned(dist, WIDTH_INDICES)));
-        dir_asc := true;
-
-        if ((to_unsigned(i, WIDTH_INDICES) and to_unsigned(dist, WIDTH_INDICES)) = to_unsigned(0, WIDTH_INDICES)) then
-          if not ((i >= LW_MAX) and (partner >= LW_MAX)) then
-            mag_a := tmp_mag(i);
-            mag_b := tmp_mag(partner);
-            idx_a := tmp_idx(i);
-            idx_b := tmp_idx(partner);
-            lsb_a := tmp_lsb(i);
-            lsb_b := tmp_lsb(partner);
-
-            do_swap := (mag_a > mag_b) or ((mag_a = mag_b) and (lsb_a > lsb_b));
-
-            if do_swap then
-              tmp_mag(i)       := mag_b;
-              tmp_mag(partner) := mag_a;
-              tmp_idx(i)       := idx_b;
-              tmp_idx(partner) := idx_a;
-              tmp_lsb(i)       := lsb_b;
-              tmp_lsb(partner) := lsb_a;
-            end if;
-          end if;
-        end if;
-      end loop;
-
-      for j in 0 to n_max - 1 loop
-        mag_stages(LOGN_MAX)(j) <= tmp_mag(j);
-        idx_stages(LOGN_MAX)(j) <= tmp_idx(j);
-        lsb_stages(LOGN_MAX)(j) <= tmp_lsb(j);
-      end loop;
-    end if;
-  end if;
-end process;
-
--------------------------------------------------------------------------
+  --------------------------------------------------------------------------
   -- output indices
   --------------------------------------------------------------------------
   process(clk, rst)
