@@ -1,33 +1,15 @@
 # Compile of bitonic_sorter.vhd was successful.
-# Compile of bitonic_sorter_2.vhd was successful.
 # Compile of bitonic_sorter_msb.vhd was successful.
-# Compile of bitonic_sorter_msb_last2full.vhd was successful.
-# Compile of bitonic_sorter_msb_last2full_tb.vhd was successful.
-# Compile of bitonic_sorter_msb_tb.vhd was successful.
-# Compile of bitonic_sorter_tb.vhd was successful.
-# Compile of config_pkg.vhd was successful.
-# Compile of controller.vhd was successful.
-# Compile of error_checker.vhd was successful.
-# Compile of error_generator.vhd was successful.
-# Compile of landslide_unit.vhd was successful.
-# Compile of llrs_in.vhd was successful.
-# Compile of lw_hw_generation_unit.vhd was successful.
-# Compile of ORBGRAND.vhd was successful.
-# Compile of ORBGRAND_tb.vhd was successful.
-# Compile of pattern_generator.vhd was successful.
-# Compile of types_pkg.vhd was successful.
-# 18 compiles, 0 failed with no errors.
-do C:/GRAND_VHDL/bitonic_sorter.do
-# vsim -gui work.bitonic_sorter_tb 
-# Start time: 16:12:50 on Apr 02,2026
+# Compile of pa_sorter.vhd was successful.
+# Compile of pa_sorter_tb.vhd was successful.
+do C:/GRAND_VHDL/pa_sorter.do
+# vsim -gui work.pa_sorter_tb 
+# Start time: 20:51:15 on Apr 15,2026
 # Loading std.standard
 # Loading std.textio(body)
 # Loading ieee.std_logic_1164(body)
 # Loading ieee.math_real(body)
 # Loading ieee.numeric_std(body)
 # Loading work.config_pkg
-# Loading work.bitonic_sorter_tb(sim)
-# Loading work.bitonic_sorter(pipeline_stage)
-quit -sim
-# End time: 17:26:07 on Apr 02,2026, Elapsed time: 1:13:17
-# Errors: 0, Warnings: 3
+# Loading work.pa_sorter_tb(sim)
+# Loading work.pa_sorter(pipeline_stage)

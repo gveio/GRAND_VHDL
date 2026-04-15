@@ -3,10 +3,10 @@ library ieee;
   use ieee.math_real.all;
   use work.config_pkg.all;
 
-entity bitonic_sorter_msb_last2full_tb is
+entity pa_sorter_tb is
 end entity;
 
-architecture sim of bitonic_sorter_msb_last2full_tb is
+architecture sim of pa_sorter_tb is
   constant n_max  : integer := 256;
   constant B_mag  : integer := 5;
   constant LW_MAX : integer := 104;
@@ -20,7 +20,7 @@ architecture sim of bitonic_sorter_msb_last2full_tb is
   signal done_sort      : std_logic;
 
 begin
-  DUT: entity work.bitonic_sorter_msb_last2full
+  DUT: entity work.pa_sorter
     generic map (n_max => n_max, B_mag => B_mag)
     port map (
       clk            => clk,

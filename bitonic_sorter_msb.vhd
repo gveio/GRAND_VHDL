@@ -6,7 +6,7 @@ use work.config_pkg.all;
 -- PIPELINED IN LOGN;
 -- SORTER USING MSB-ONLY COMPARISON WITH FULL PRECISION IN THE LAST TWO STAGES;
 
-entity bitonic_sorter_msb_last2full is
+entity bitonic_sorter_msb is
   generic (
     n_max  : integer := 256;
     B_mag  : integer := 5;
@@ -22,7 +22,7 @@ entity bitonic_sorter_msb_last2full is
   );
 end entity;
 
-architecture pipeline_stage of bitonic_sorter_msb_last2full is
+architecture pipeline_stage of bitonic_sorter_msb is
 
   function int_log2_ceil(x : integer) return integer is
   begin
@@ -49,7 +49,7 @@ architecture pipeline_stage of bitonic_sorter_msb_last2full is
 
   constant LOGN_MAX  : integer := int_log2_ceil(n_max);
   constant MSB_NUM   : integer := 3;
-  constant LSB_NUM   : integer := 1;
+  constant LSB_NUM   : integer := 2;
   constant TIE_START : integer := LOGN_MAX - 2;
 
   type mag_array   is array (0 to n_max - 1) of unsigned(MSB_NUM - 1 downto 0);
@@ -117,7 +117,7 @@ begin
           if i < n_r then
             mag_stages(0)(i) <= unsigned(LLR_mag((i + 1) * B_mag - 1 downto (i + 1) * B_mag - MSB_NUM));
             idx_stages(0)(i) <= to_unsigned(i, WIDTH_INDICES);
-            lsb_stages(0)(i) <= unsigned(LLR_mag(i * B_mag downto i * B_mag));
+            lsb_stages(0)(i) <= unsigned(LLR_mag(i * B_mag + (LSB_NUM - 1) downto i * B_mag));
           else
              mag_stages(0)(i) <= (others => '1');
             idx_stages(0)(i) <= to_unsigned(i, WIDTH_INDICES);
@@ -204,31 +204,31 @@ begin
                   lsb_a := tmp_lsb(i);
                   lsb_b := tmp_lsb(partner);
 
-                        if TIE_STAGE then
-                            full_a := mag_a & lsb_a;
-                            full_b := mag_b & lsb_b;
+                  if TIE_STAGE then
+                      full_a := mag_a & lsb_a;
+                      full_b := mag_b & lsb_b;
 
-                            if dir_asc then
-                                do_swap := (full_a > full_b);
-                            else
-                                do_swap := (full_a < full_b);
-                            end if;
-                        else
-                            if dir_asc then
-                                do_swap := (mag_a > mag_b);
-                            else
-                                do_swap := (mag_a < mag_b);
-                            end if;
-                        end if;
+                      if dir_asc then
+                          do_swap := (full_a > full_b);
+                      else
+                          do_swap := (full_a < full_b);
+                      end if;
+                  else
+                      if dir_asc then
+                          do_swap := (mag_a > mag_b);
+                      else
+                          do_swap := (mag_a < mag_b);
+                      end if;
+                  end if;
 
-					  if do_swap then
-						tmp_mag(i) := mag_b;
-						tmp_mag(partner) := mag_a;
-						tmp_idx(i) := idx_b;
-						tmp_idx(partner) := idx_a;
-						tmp_lsb(i) := lsb_b;
-						tmp_lsb(partner) := lsb_a;
-					  end if;
+                  if do_swap then
+                  tmp_mag(i) := mag_b;
+                  tmp_mag(partner) := mag_a;
+                  tmp_idx(i) := idx_b;
+                  tmp_idx(partner) := idx_a;
+                  tmp_lsb(i) := lsb_b;
+                  tmp_lsb(partner) := lsb_a;
+                  end if;
 
                 end if;
             end loop;

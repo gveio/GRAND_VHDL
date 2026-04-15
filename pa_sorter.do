@@ -1,46 +1,46 @@
-vsim -gui work.bitonic_sorter_msb_last2full_tb
+vsim -gui work.pa_sorter_tb
 
 # ============================================================
 # Clock & Reset
 # ============================================================
 add wave -divider "Clock & Reset"
-add wave sim:/bitonic_sorter_msb_last2full_tb/clk
-add wave sim:/bitonic_sorter_msb_last2full_tb/rst
+add wave sim:/pa_sorter_tb/clk
+add wave sim:/pa_sorter_tb/rst
 
 # ============================================================
 # Inputs
 # ============================================================
 add wave -divider "Inputs"
-add wave sim:/bitonic_sorter_msb_last2full_tb/LLR_mag
-add wave sim:/bitonic_sorter_msb_last2full_tb/DUT/sort_en
+add wave sim:/pa_sorter_tb/LLR_mag
+add wave sim:/pa_sorter_tb/DUT/sort_en
 
 # ============================================================
 # Runtime parameters
 # ============================================================
 add wave -divider "Runtime parameters"
-add wave sim:/bitonic_sorter_msb_last2full_tb/DUT/n_r
-add wave sim:/bitonic_sorter_msb_last2full_tb/DUT/load_en
+add wave sim:/pa_sorter_tb/DUT/n_r
+add wave sim:/pa_sorter_tb/DUT/load_en
 
 # ============================================================
 # Magnitude & Index Pipeline Registers
 # ============================================================
 add wave -divider "Mag,Index regs"
-add wave sim:/bitonic_sorter_msb_last2full_tb/DUT/mag_stages
-add wave sim:/bitonic_sorter_msb_last2full_tb/DUT/idx_stages
-add wave sim:/bitonic_sorter_msb_last2full_tb/DUT/lsb_stages
+add wave sim:/pa_sorter_tb/DUT/mag_stages
+add wave sim:/pa_sorter_tb/DUT/idx_stages
+add wave sim:/pa_sorter_tb/DUT/lsb_stages
 
 # ============================================================
 # Valid Pipeline Control
 # ============================================================
 add wave -divider "Valid Pipeline Control"
-add wave sim:/bitonic_sorter_msb_last2full_tb/DUT/stage_valid
+add wave sim:/pa_sorter_tb/DUT/stage_valid
 
 # ============================================================
 # Outputs
 # ============================================================
 add wave -divider "Outputs"
-add wave sim:/bitonic_sorter_msb_last2full_tb/sorted_indices
-add wave sim:/bitonic_sorter_msb_last2full_tb/done_sort
+add wave sim:/pa_sorter_tb/sorted_indices
+add wave sim:/pa_sorter_tb/done_sort
 
 # ============================================================
 # Run simulation
