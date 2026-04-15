@@ -13,3 +13,18 @@ do C:/GRAND_VHDL/pa_sorter.do
 # Loading work.config_pkg
 # Loading work.pa_sorter_tb(sim)
 # Loading work.pa_sorter(pipeline_stage)
+do C:/GRAND_VHDL/bitonic_sorter_msb.do
+# End time: 20:55:11 on Apr 15,2026, Elapsed time: 0:03:56
+# Errors: 0, Warnings: 8
+# vsim -gui work.bitonic_sorter_msb_tb 
+# Start time: 20:55:11 on Apr 15,2026
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.math_real(body)
+# Loading ieee.numeric_std(body)
+# Loading work.config_pkg
+# Loading work.bitonic_sorter_msb_tb(sim)
+# Loading work.bitonic_sorter_msb(pipeline_stage)
+# End time: 20:57:03 on Apr 15,2026, Elapsed time: 0:01:52
+# Errors: 0, Warnings: 1
