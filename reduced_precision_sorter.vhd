@@ -4,7 +4,7 @@ library ieee;
   use ieee.math_real.all;
   use work.config_pkg.all;
 
-entity pa_sorter is
+entity reduced_precision_sorter is
   generic (
     n_max  : integer := 256;
     B_mag  : integer := 5;
@@ -19,7 +19,7 @@ entity pa_sorter is
        );
 end entity;
 
-architecture pipeline_stage of pa_sorter is
+architecture pipeline_stage of reduced_precision_sorter is
 
   -- Function to round n up to next power of two
   function ceil_pow2(x : integer) return integer is
@@ -71,7 +71,6 @@ architecture pipeline_stage of pa_sorter is
   -- Constants
   constant LOGN_MAX  : integer := int_log2_ceil(n_max);
   constant MSB_NUM   : integer := 3;
-  constant LSB_NUM   : integer := 2;
   
   -- Type definitions
   type mag_array is array (0 to n_max - 1) of unsigned(MSB_NUM - 1 downto 0); --holds the magnitudes
@@ -80,12 +79,6 @@ architecture pipeline_stage of pa_sorter is
   -- Stage arrays(each stage takes the output of the previous one as its input)
   type mag_stage_array is array (0 to LOGN_MAX) of mag_array; --stores the LLR magnitudes of all sorting stages(2D array [stage][element])
   type index_stage_array is array (0 to LOGN_MAX) of index_array; --stores the index order evolution through stages(2D array [stage][index])
-  
-  type lsb_array is array (0 to n_max - 1) of unsigned(LSB_NUM - 1 downto 0);
-  type lsb_stage_array is array (0 to LOGN_MAX) of lsb_array;
-
-  signal lsb_stages  : lsb_stage_array;
-  signal tie_start_s : integer range 0 to LOGN_MAX := LOGN_MAX - 2;
   
   -- Mask for which sorting stages are active for the current n_effective
   signal active_stage : std_logic_vector(LOGN_MAX - 1 downto 0) := (others => '0');
@@ -114,7 +107,6 @@ begin
   begin
     if rst = '1' then
       n_r         <= 0;
-      tie_start_s <= LOGN_MAX - 2;
       active_mask <= (others => '0');
       active_stage <= (others => '0');
 
@@ -123,13 +115,6 @@ begin
         n_r <= n;
         n_effective := ceil_pow2(n);
         logn_eff := int_log2_ceil(n_effective);
-
-        -- Enable tie-breaking only in the last two active stages
-        if logn_eff >= 2 then
-          tie_start_s <= logn_eff - 2;
-        else
-          tie_start_s <= 0;
-        end if;
 
         -- Active lanes belong to the rounded-up active problem size
         for i in 0 to n_max - 1 loop
@@ -170,7 +155,6 @@ begin
       for i in 0 to n_max - 1 loop
         mag_stages(0)(i) <= (others => '0');
         idx_stages(0)(i) <= (others => '0');
-		lsb_stages(0)(i) <= (others => '0');
       end loop;
 
     elsif rising_edge(clk) then
@@ -181,16 +165,12 @@ begin
           if i < n_r then
             mag_stages(0)(i) <= unsigned(LLR_mag((i + 1) * B_mag - 1 downto (i + 1) * B_mag - MSB_NUM));
             idx_stages(0)(i) <= to_unsigned(i, WIDTH_INDICES);
-            lsb_stages(0)(i) <= unsigned(LLR_mag(i * B_mag + (LSB_NUM - 1) downto i * B_mag));
-            --LSB_NUM = 1, lsb_stages(0)(i) <= unsigned(LLR_mag(i * B_mag + 1 downto i * B_mag + 1));
           elsif active_mask(i) = '1' then -- i < n_effective 
             mag_stages(0)(i) <= (others => '1');
             idx_stages(0)(i) <= to_unsigned(i, WIDTH_INDICES);
-            lsb_stages(0)(i) <= (others => '1');
           else
             mag_stages(0)(i) <= (others => '0');
             idx_stages(0)(i) <= (others => '0');
-			lsb_stages(0)(i) <= (others => '0');
           end if;
         end loop;
       end if;
@@ -233,25 +213,20 @@ begin
       variable dir_asc      : boolean;
       variable mag_a, mag_b : unsigned(MSB_NUM - 1 downto 0);
       variable idx_a, idx_b : unsigned(WIDTH_INDICES - 1 downto 0);
-	  variable lsb_a, lsb_b   : unsigned(LSB_NUM - 1 downto 0);
-	  variable full_a, full_b : unsigned(MSB_NUM + LSB_NUM - 1 downto 0);
       variable tmp_mag      : mag_array;
       variable tmp_idx      : index_array;
-	  variable tmp_lsb      : lsb_array;
 	  variable do_swap      : boolean;
     begin
       if rst = '1' then
         for i in 0 to n_max - 1 loop
           mag_stages(s + 1)(i) <= (others => '0');
           idx_stages(s + 1)(i) <= (others => '0');
-          lsb_stages(s + 1)(i) <= (others => '0');
         end loop;
 
       elsif rising_edge(clk) then
         for i in 0 to n_max - 1 loop
           tmp_mag(i) := mag_stages(s)(i);
           tmp_idx(i) := idx_stages(s)(i);
-          tmp_lsb(i) := lsb_stages(s)(i);
         end loop;
 
         if stage_valid(s) = '1' then
@@ -283,44 +258,28 @@ begin
                   mag_b := tmp_mag(partner);
                   idx_a := tmp_idx(i);
                   idx_b := tmp_idx(partner);
-				  lsb_a := tmp_lsb(i);
-                  lsb_b := tmp_lsb(partner);
-
-                  if s >= tie_start_s then
-                    full_a := mag_a & lsb_a;
-                    full_b := mag_b & lsb_b;
-
-                    if dir_asc then
-                        do_swap := (full_a > full_b);
-                    else
-                        do_swap := (full_a < full_b);
-                    end if;
+			
+                  if dir_asc then
+                      do_swap := (mag_a > mag_b);
                   else
-                    if dir_asc then
-                        do_swap := (mag_a > mag_b);
-                    else
-                        do_swap := (mag_a < mag_b);
-                    end if;
+                      do_swap := (mag_a < mag_b);
                   end if;
 
-					if do_swap then
-						tmp_mag(i) := mag_b;
-						tmp_mag(partner) := mag_a;
-						tmp_idx(i) := idx_b;
-						tmp_idx(partner) := idx_a;
-						tmp_lsb(i) := lsb_b;
-						tmp_lsb(partner) := lsb_a;
-					end if;
+                  if do_swap then
+                    tmp_mag(i) := mag_b;
+                    tmp_mag(partner) := mag_a;
+                    tmp_idx(i) := idx_b;
+                    tmp_idx(partner) := idx_a;
+                  end if;
                 end if;
-			  end if;
-            end loop;
+			        end if;
            end loop;
+         end loop;
 		  end if;
           -- register stage output
           for j in 0 to n_max - 1 loop
             mag_stages(s + 1)(j) <= tmp_mag(j);
             idx_stages(s + 1)(j) <= tmp_idx(j);
-			lsb_stages(s + 1)(j) <= tmp_lsb(j);
           end loop;
         end if;
       end if;
