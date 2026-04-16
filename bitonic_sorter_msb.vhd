@@ -118,6 +118,7 @@ begin
             mag_stages(0)(i) <= unsigned(LLR_mag((i + 1) * B_mag - 1 downto (i + 1) * B_mag - MSB_NUM));
             idx_stages(0)(i) <= to_unsigned(i, WIDTH_INDICES);
             lsb_stages(0)(i) <= unsigned(LLR_mag(i * B_mag + (LSB_NUM - 1) downto i * B_mag));
+            --LSB_NUM = 1, lsb_stages(0)(i) <= unsigned(LLR_mag(i * B_mag + 1 downto i * B_mag + 1));
           else
              mag_stages(0)(i) <= (others => '1');
             idx_stages(0)(i) <= to_unsigned(i, WIDTH_INDICES);
