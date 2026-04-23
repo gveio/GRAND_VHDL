@@ -1,23 +1,8 @@
-# Compile of bitonic_sorter.vhd was successful.
 # Compile of bitonic_sorter_msb.vhd was successful.
-# Compile of pa_sorter.vhd was successful.
-# Compile of pa_sorter_tb.vhd was successful.
-do C:/GRAND_VHDL/pa_sorter.do
-# vsim -gui work.pa_sorter_tb 
-# Start time: 20:51:15 on Apr 15,2026
-# Loading std.standard
-# Loading std.textio(body)
-# Loading ieee.std_logic_1164(body)
-# Loading ieee.math_real(body)
-# Loading ieee.numeric_std(body)
-# Loading work.config_pkg
-# Loading work.pa_sorter_tb(sim)
-# Loading work.pa_sorter(pipeline_stage)
+# Compile of bitonic_sorter_msb_tb.vhd was successful.
 do C:/GRAND_VHDL/bitonic_sorter_msb.do
-# End time: 20:55:11 on Apr 15,2026, Elapsed time: 0:03:56
-# Errors: 0, Warnings: 8
 # vsim -gui work.bitonic_sorter_msb_tb 
-# Start time: 20:55:11 on Apr 15,2026
+# Start time: 14:08:57 on Apr 23,2026
 # Loading std.standard
 # Loading std.textio(body)
 # Loading ieee.std_logic_1164(body)
@@ -26,5 +11,52 @@ do C:/GRAND_VHDL/bitonic_sorter_msb.do
 # Loading work.config_pkg
 # Loading work.bitonic_sorter_msb_tb(sim)
 # Loading work.bitonic_sorter_msb(pipeline_stage)
-# End time: 20:57:03 on Apr 15,2026, Elapsed time: 0:01:52
+restart
+# ** Note: (vsim-12125) Error and warning message counts have been reset to '0' because of 'restart'.
+run -all
+quit -sim
+# End time: 14:11:35 on Apr 23,2026, Elapsed time: 0:02:38
 # Errors: 0, Warnings: 1
+# Compile of bitonic_sorter_msb.vhd was successful.
+do C:/GRAND_VHDL/bitonic_sorter_msb.do
+# vsim -gui work.bitonic_sorter_msb_tb 
+# Start time: 14:15:19 on Apr 23,2026
+# Loading std.standard
+# ** Error: (vsim-13) Recompile work.bitonic_sorter_msb_tb(sim) because work.bitonic_sorter_msb has changed.
+# Error loading design
+# Error: Error loading design
+#        Pausing macro execution
+# MACRO C:\GRAND_VHDL\bitonic_sorter_msb.do PAUSED at line 1
+# Compile of bitonic_sorter_msb_tb.vhd was successful.
+do C:/GRAND_VHDL/bitonic_sorter_msb.do
+# vsim -gui work.bitonic_sorter_msb_tb 
+# Start time: 14:15:19 on Apr 23,2026
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.math_real(body)
+# Loading ieee.numeric_std(body)
+# Loading work.config_pkg
+# Loading work.bitonic_sorter_msb_tb(sim)
+# Loading work.bitonic_sorter_msb(pipeline_stage)
+quit -sim
+# End time: 14:27:42 on Apr 23,2026, Elapsed time: 0:12:23
+# Errors: 1, Warnings: 3
+# Compile of bitonic_sorter_msb.vhd was successful.
+# Compile of bitonic_sorter_msb_tb.vhd was successful.
+do C:/GRAND_VHDL/bitonic_sorter_msb.do
+# vsim -gui work.bitonic_sorter_msb_tb 
+# Start time: 14:31:09 on Apr 23,2026
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.math_real(body)
+# Loading ieee.numeric_std(body)
+# Loading work.config_pkg
+# Loading work.bitonic_sorter_msb_tb(sim)
+# Loading work.bitonic_sorter_msb(pipeline_stage)
+quit -sim
+# End time: 14:34:28 on Apr 23,2026, Elapsed time: 0:03:19
+# Errors: 0, Warnings: 3
+# Compile of bitonic_sorter_msb.vhd was successful.
+# Compile of pa_sorter.vhd was successful.
