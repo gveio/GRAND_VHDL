@@ -50,7 +50,7 @@ architecture pipeline_stage of bitonic_sorter_msb_pruned is
 
   constant LOGN_MAX  : integer := int_log2_ceil(n_max);
   constant MSB_NUM   : integer := 3;
-  constant LSB_NUM   : integer := 1;
+  constant LSB_NUM   : integer := 2;
   constant TIE_START : integer := LOGN_MAX - 2;
 
   type mag_array   is array (0 to n_max - 1) of unsigned(MSB_NUM - 1 downto 0);
@@ -117,9 +117,9 @@ begin
           if i < n_r then
             mag_stages(0)(i) <= unsigned(LLR_mag((i + 1) * B_mag - 1 downto (i + 1) * B_mag - MSB_NUM));
             idx_stages(0)(i) <= to_unsigned(i, WIDTH_INDICES);
-            --lsb_stages(0)(i) <= unsigned(LLR_mag(i * B_mag + (LSB_NUM - 1) downto i * B_mag));
+            lsb_stages(0)(i) <= unsigned(LLR_mag(i * B_mag + (LSB_NUM - 1) downto i * B_mag));
             --LSB_NUM = 1, 
-            lsb_stages(0)(i) <= unsigned(LLR_mag(i * B_mag + 1 downto i * B_mag + 1));
+            --lsb_stages(0)(i) <= unsigned(LLR_mag(i * B_mag + 1 downto i * B_mag + 1));
           else
             mag_stages(0)(i) <= (others => '1');
             idx_stages(0)(i) <= to_unsigned(i, WIDTH_INDICES);
